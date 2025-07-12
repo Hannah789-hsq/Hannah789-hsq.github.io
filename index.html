@@ -1,1165 +1,2778 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>意moji：七下诗词意象配对</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#5D5CDE',
-                        secondary: '#4CAF50',
-                        accent: '#E57373',
-                    },
-                    fontFamily: {
-                        'dancing': ['Dancing Script', 'cursive'],
-                        'chinese': ['STKaiti', 'KaiTi', 'SimKai', 'serif'],
-                    }
-                }
+    <title>中国传统植物人格测试</title>
+    <style>
+        /* 基础样式与中国风设计 */
+        :root {
+            --primary-color: #d4669c;
+            --secondary-color: linear-gradient(135deg, #fdf7f0 0%, #f9f0e8 50%, #f0e6dd 100%);
+            --text-color: #2c1810;
+            --bg-color: linear-gradient(135deg, #fef9f3 0%, #fdf4ed 50%, #f9f0e8 100%);
+            --border-color: #d4a574;
+            --transition-time: 0.3s;
+            --lotus-color: #f3c1c9;
+            --chrysanthemum-color: #f8d568;
+            --peony-color: #e84c65;
+            --bamboo-color: #8dc789;
+            --plum-color: #eab3c3;
+            --pine-color: #3f7554;
+            --accent-color: #8e4585;
+            --soft-pink: #f7d7e2;
+            --soft-purple: #e8d5f2;
+            --soft-gold: #f9e79f;
+            --soft-green: #d5f4e6;
+        }
+
+        .dark {
+            --primary-color: #c85151;
+            --secondary-color: #4d4238;
+            --text-color: #e8e8e8;
+            --bg-color: #282521;
+            --border-color: #635648;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "SimSun", sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            transition: all var(--transition-time);
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(244, 102, 156, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(142, 69, 133, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(212, 166, 116, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* 中国风纸张效果容器 */
+        .scroll-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--secondary-color);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(212, 102, 156, 0.1), 0 4px 16px rgba(142, 69, 133, 0.08);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid;
+            border-image: linear-gradient(135deg, #d4a574, #e8c547, #d4a574) 1;
+        }
+
+
+
+        h1 {
+            background: linear-gradient(135deg, #d4669c, #8e4585, #5e3a70, #3d2a5b, #2d1f46);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.8rem;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: 8px;
+        }
+
+        h1::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #d4669c, #8e4585, #d4669c, transparent);
+            border-radius: 2px;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8e4585, #d4669c, #8e4585, transparent);
+            border-radius: 1px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            text-align: justify;
+            line-height: 1.8;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 25px auto;
+            box-shadow: 0 6px 20px rgba(212, 102, 156, 0.3);
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #b8548a, #7a3572);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 102, 156, 0.4);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 问题与选项样式 */
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .question::before {
+            content: "问";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .option {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            padding-left: 35px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: rgba(201, 173, 145, 0.3);
+        }
+
+        .option.selected {
+            background-color: rgba(165, 63, 63, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .option input {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* 进度指示器 */
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* 结果页面样式 */
+        .result-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .plant-image {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .plant-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .person-name {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .plant-description {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .plant-symbolism {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .plant-poem {
+            font-style: italic;
+            padding: 15px;
+            background-color: rgba(201, 173, 145, 0.3);
+            border-left: 3px solid var(--primary-color);
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .share-buttons {
+            margin-top: 30px;
+        }
+
+        .restart-btn {
+            margin-top: 30px;
+        }
+
+        /* 荷花图形 */
+        .lotus {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .lotus .center {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #f8e58c;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .lotus .petal {
+            position: absolute;
+            width: 70px;
+            height: 60px;
+            background: var(--lotus-color);
+            border-radius: 70% 0 70% 0;
+            top: 50%;
+            left: 50%;
+        }
+
+        .lotus .petal:nth-child(1) {
+            transform: translate(-50%, -50%) rotate(0deg) translateX(50px);
+        }
+
+        .lotus .petal:nth-child(2) {
+            transform: translate(-50%, -50%) rotate(45deg) translateX(50px);
+        }
+
+        .lotus .petal:nth-child(3) {
+            transform: translate(-50%, -50%) rotate(90deg) translateX(50px);
+        }
+
+        .lotus .petal:nth-child(4) {
+            transform: translate(-50%, -50%) rotate(135deg) translateX(50px);
+        }
+
+        .lotus .petal:nth-child(5) {
+            transform: translate(-50%, -50%) rotate(180deg) translateX(50px);
+        }
+
+        .lotus .petal:nth-child(6) {
+            transform: translate(-50%, -50%) rotate(225deg) translateX(50px);
+        }
+
+        .lotus .petal:nth-child(7) {
+            transform: translate(-50%, -50%) rotate(270deg) translateX(50px);
+        }
+
+        .lotus .petal:nth-child(8) {
+            transform: translate(-50%, -50%) rotate(315deg) translateX(50px);
+        }
+
+        .lotus .leaf {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background: #65a865;
+            border-radius: 50%;
+            bottom: 0;
+        }
+
+        .lotus .leaf:nth-child(10) {
+            left: 20px;
+            transform: rotate(-20deg);
+        }
+
+        .lotus .leaf:nth-child(11) {
+            right: 20px;
+            transform: rotate(20deg);
+        }
+
+        /* 菊花图形 */
+        .chrysanthemum {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .chrysanthemum .center {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #e08c3c;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .chrysanthemum .petal {
+            position: absolute;
+            width: 15px;
+            height: 60px;
+            background: var(--chrysanthemum-color);
+            border-radius: 50% 50% 0 0;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+        }
+
+        .chrysanthemum .stem {
+            position: absolute;
+            width: 5px;
+            height: 80px;
+            background: #65a865;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .chrysanthemum .leaf {
+            position: absolute;
+            width: 30px;
+            height: 15px;
+            background: #65a865;
+            border-radius: 50% 50% 0 0;
+            bottom: 30px;
+        }
+
+        .chrysanthemum .leaf:nth-child(19) {
+            left: 40%;
+            transform: rotate(-30deg);
+        }
+
+        .chrysanthemum .leaf:nth-child(20) {
+            right: 40%;
+            transform: rotate(30deg);
+        }
+
+        /* 牡丹图形 */
+        .peony {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .peony .center {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #f8d271;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .peony .layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .peony .petal {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            background: var(--peony-color);
+            border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+        }
+
+        .peony .stem {
+            position: absolute;
+            width: 8px;
+            height: 70px;
+            background: #65a865;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .peony .leaf {
+            position: absolute;
+            width: 40px;
+            height: 25px;
+            background: #65a865;
+            border-radius: 50%;
+            bottom: 40px;
+        }
+
+        .peony .leaf:nth-child(32) {
+            left: 30px;
+            transform: rotate(-30deg);
+        }
+
+        .peony .leaf:nth-child(33) {
+            right: 30px;
+            transform: rotate(30deg);
+        }
+
+        /* 竹子图形 */
+        .bamboo {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bamboo .stalk {
+            position: absolute;
+            width: 15px;
+            height: 180px;
+            background: #8dc789;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 10px;
+        }
+
+        .bamboo .node {
+            position: absolute;
+            width: 20px;
+            height: 5px;
+            background: #65a865;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .bamboo .leaf {
+            position: absolute;
+            width: 60px;
+            height: 15px;
+            background: var(--bamboo-color);
+            border-radius: 100% 0 100% 0;
+        }
+
+        /* 梅花图形 */
+        .plum {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .plum .branch {
+            position: absolute;
+            width: 5px;
+            height: 120px;
+            background: #795548;
+            left: 50%;
+            transform: translateX(-50%) rotate(15deg);
+            top: 40px;
+        }
+
+        .plum .branch:nth-child(2) {
+            transform: translateX(-70%) rotate(-20deg);
+            height: 100px;
+        }
+
+        .plum .branch:nth-child(3) {
+            transform: translateX(0%) rotate(30deg);
+            height: 90px;
+            top: 60px;
+        }
+
+        .plum .flower {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: var(--plum-color);
+            border-radius: 50%;
+        }
+        
+        /* 松树图形 */
+        .pine {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .pine .trunk {
+            position: absolute;
+            width: 20px;
+            height: 120px;
+            background: #795548;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+        }
+
+        .pine .branch {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 80px solid transparent;
+            border-right: 80px solid transparent;
+            border-bottom: 70px solid var(--pine-color);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* 适配不同屏幕尺寸 */
+        @media screen and (max-width: 600px) {
+            .scroll-container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .option {
+                padding: 10px 10px 10px 35px;
+            }
+
+            .plant-image {
+                width: 150px;
+                height: 150px;
             }
         }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Dancing+Script:wght@400;700&display=swap');
-        
-        body {
-            font-family: 'Noto Serif SC', serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-        
-        .game-title {
-            background: linear-gradient(45deg, #8B4513, #D2691E);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-family: 'STKaiti', 'KaiTi', 'SimKai', serif;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            margin-right: 8px;
-        }
-        
-        .emoji-title {
-            font-family: 'Dancing Script', cursive;
-            font-weight: 700;
-            font-size: 1.8rem;
-            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .emoji-card {
-            transition: all 0.3s ease-in-out;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .emoji-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .emoji-card.selected {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            transform: scale(1.05);
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .progress-dot {
-            width: 12px;
-            height: 12px;
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        /* 隐藏元素 */
+        .hidden {
+            display: none;
+        }
+
+        /* 添加竹子叶 */
+        .bamboo .leaf:nth-child(3) {
+            top: 30px;
+            left: 70px;
+            transform: rotate(30deg);
+        }
+
+        .bamboo .leaf:nth-child(4) {
+            top: 50px;
+            left: 75px;
+            transform: rotate(20deg);
+        }
+
+        .bamboo .leaf:nth-child(5) {
+            top: 70px;
+            left: 70px;
+            transform: rotate(40deg);
+        }
+
+        .bamboo .leaf:nth-child(6) {
+            top: 90px;
+            left: 75px;
+            transform: rotate(25deg);
+        }
+
+        .bamboo .leaf:nth-child(7) {
+            top: 30px;
+            right: 70px;
+            transform: rotate(-30deg);
+        }
+
+        .bamboo .leaf:nth-child(8) {
+            top: 50px;
+            right: 75px;
+            transform: rotate(-20deg);
+        }
+
+        .bamboo .leaf:nth-child(9) {
+            top: 70px;
+            right: 70px;
+            transform: rotate(-40deg);
+        }
+
+        .bamboo .leaf:nth-child(10) {
+            top: 90px;
+            right: 75px;
+            transform: rotate(-25deg);
+        }
+
+        /* 添加竹节 */
+        .bamboo .node:nth-child(11) {
+            top: 40px;
+        }
+
+        .bamboo .node:nth-child(12) {
+            top: 80px;
+        }
+
+        .bamboo .node:nth-child(13) {
+            top: 120px;
+        }
+
+        .bamboo .node:nth-child(14) {
+            top: 160px;
+        }
+
+        /* 添加牡丹花瓣 */
+        .peony .petal:nth-child(1) {
+            transform: rotate(0deg) translateY(-30px);
+        }
+
+        .peony .petal:nth-child(2) {
+            transform: rotate(45deg) translateY(-30px);
+        }
+
+        .peony .petal:nth-child(3) {
+            transform: rotate(90deg) translateY(-30px);
+        }
+
+        .peony .petal:nth-child(4) {
+            transform: rotate(135deg) translateY(-30px);
+        }
+
+        .peony .petal:nth-child(5) {
+            transform: rotate(180deg) translateY(-30px);
+        }
+
+        .peony .petal:nth-child(6) {
+            transform: rotate(225deg) translateY(-30px);
+        }
+
+        .peony .petal:nth-child(7) {
+            transform: rotate(270deg) translateY(-30px);
+        }
+
+        .peony .petal:nth-child(8) {
+            transform: rotate(315deg) translateY(-30px);
+        }
+
+        /* 添加第二层牡丹花瓣 */
+        .peony .petal:nth-child(9) {
+            transform: rotate(22.5deg) translateY(-45px);
+            width: 35px;
+            height: 55px;
+        }
+
+        .peony .petal:nth-child(10) {
+            transform: rotate(67.5deg) translateY(-45px);
+            width: 35px;
+            height: 55px;
+        }
+
+        .peony .petal:nth-child(11) {
+            transform: rotate(112.5deg) translateY(-45px);
+            width: 35px;
+            height: 55px;
+        }
+
+        .peony .petal:nth-child(12) {
+            transform: rotate(157.5deg) translateY(-45px);
+            width: 35px;
+            height: 55px;
+        }
+
+        .peony .petal:nth-child(13) {
+            transform: rotate(202.5deg) translateY(-45px);
+            width: 35px;
+            height: 55px;
+        }
+
+        .peony .petal:nth-child(14) {
+            transform: rotate(247.5deg) translateY(-45px);
+            width: 35px;
+            height: 55px;
+        }
+
+        .peony .petal:nth-child(15) {
+            transform: rotate(292.5deg) translateY(-45px);
+            width: 35px;
+            height: 55px;
+        }
+
+        .peony .petal:nth-child(16) {
+            transform: rotate(337.5deg) translateY(-45px);
+            width: 35px;
+            height: 55px;
+        }
+
+        /* 添加菊花花瓣 */
+        .chrysanthemum .petal:nth-child(1) { transform: translate(-50%, -50%) rotate(0deg); }
+        .chrysanthemum .petal:nth-child(2) { transform: translate(-50%, -50%) rotate(20deg); }
+        .chrysanthemum .petal:nth-child(3) { transform: translate(-50%, -50%) rotate(40deg); }
+        .chrysanthemum .petal:nth-child(4) { transform: translate(-50%, -50%) rotate(60deg); }
+        .chrysanthemum .petal:nth-child(5) { transform: translate(-50%, -50%) rotate(80deg); }
+        .chrysanthemum .petal:nth-child(6) { transform: translate(-50%, -50%) rotate(100deg); }
+        .chrysanthemum .petal:nth-child(7) { transform: translate(-50%, -50%) rotate(120deg); }
+        .chrysanthemum .petal:nth-child(8) { transform: translate(-50%, -50%) rotate(140deg); }
+        .chrysanthemum .petal:nth-child(9) { transform: translate(-50%, -50%) rotate(160deg); }
+        .chrysanthemum .petal:nth-child(10) { transform: translate(-50%, -50%) rotate(180deg); }
+        .chrysanthemum .petal:nth-child(11) { transform: translate(-50%, -50%) rotate(200deg); }
+        .chrysanthemum .petal:nth-child(12) { transform: translate(-50%, -50%) rotate(220deg); }
+        .chrysanthemum .petal:nth-child(13) { transform: translate(-50%, -50%) rotate(240deg); }
+        .chrysanthemum .petal:nth-child(14) { transform: translate(-50%, -50%) rotate(260deg); }
+        .chrysanthemum .petal:nth-child(15) { transform: translate(-50%, -50%) rotate(280deg); }
+        .chrysanthemum .petal:nth-child(16) { transform: translate(-50%, -50%) rotate(300deg); }
+        .chrysanthemum .petal:nth-child(17) { transform: translate(-50%, -50%) rotate(320deg); }
+        .chrysanthemum .petal:nth-child(18) { transform: translate(-50%, -50%) rotate(340deg); }
+
+        /* 添加梅花花朵 */
+        .plum .flower:nth-child(4) { top: 30px; left: 50%; }
+        .plum .flower:nth-child(5) { top: 60px; left: 30%; }
+        .plum .flower:nth-child(6) { top: 75px; left: 60%; }
+        .plum .flower:nth-child(7) { top: 100px; left: 40%; }
+        .plum .flower:nth-child(8) { top: 120px; left: 70%; }
+        .plum .flower:nth-child(9) { top: 50px; left: 75%; }
+        .plum .flower:nth-child(10) { top: 90px; left: 20%; }
+
+        /* 添加松树层次 */
+        .pine .branch:nth-child(2) { bottom: 80px; }
+        .pine .branch:nth-child(3) { bottom: 50px; border-bottom-width: 60px; }
+        .pine .branch:nth-child(4) { bottom: 20px; border-bottom-width: 50px; }
+        
+        /* 杜鹃花图形 */
+        .azalea {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .azalea .center {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #e3424b;
             border-radius: 50%;
-            background-color: #e0e0e0;
-            display: inline-block;
-            margin: 0 6px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .azalea .petal {
+            position: absolute;
+            width: 35px;
+            height: 45px;
+            background: #ff6b6b;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            top: 50%;
+            left: 50%;
+        }
+        
+        .azalea .stem {
+            position: absolute;
+            width: 6px;
+            height: 60px;
+            background: #65a865;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .azalea .leaf {
+            position: absolute;
+            width: 35px;
+            height: 20px;
+            background: #65a865;
+            border-radius: 50% 50% 50% 50%;
+        }
+        
+        /* 添加杜鹃花瓣 */
+        .azalea .petal:nth-child(1) { transform: translate(-50%, -50%) rotate(0deg) translateY(-30px); }
+        .azalea .petal:nth-child(2) { transform: translate(-50%, -50%) rotate(45deg) translateY(-30px); }
+        .azalea .petal:nth-child(3) { transform: translate(-50%, -50%) rotate(90deg) translateY(-30px); }
+        .azalea .petal:nth-child(4) { transform: translate(-50%, -50%) rotate(135deg) translateY(-30px); }
+        .azalea .petal:nth-child(5) { transform: translate(-50%, -50%) rotate(180deg) translateY(-30px); }
+        .azalea .petal:nth-child(6) { transform: translate(-50%, -50%) rotate(225deg) translateY(-30px); }
+        .azalea .petal:nth-child(7) { transform: translate(-50%, -50%) rotate(270deg) translateY(-30px); }
+        .azalea .petal:nth-child(8) { transform: translate(-50%, -50%) rotate(315deg) translateY(-30px); }
+        
+        /* 添加杜鹃叶子 */
+        .azalea .leaf:nth-child(10) { bottom: 30px; left: 30px; transform: rotate(-20deg); }
+        .azalea .leaf:nth-child(11) { bottom: 50px; right: 30px; transform: rotate(20deg); }
+        .azalea .leaf:nth-child(12) { bottom: 70px; left: 25px; transform: rotate(-30deg); }
+        
+        /* 海棠花图形 */
+        .begonia {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .begonia .branch {
+            position: absolute;
+            width: 4px;
+            height: 120px;
+            background: #8b5a2b;
+            left: 50%;
+            transform: translateX(-50%) rotate(-10deg);
+            top: 40px;
+        }
+        
+        .begonia .branch:nth-child(2) {
+            transform: translateX(-60%) rotate(-25deg);
+            height: 90px;
+        }
+        
+        .begonia .flower {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #f08080;
+            border-radius: 50%;
+        }
+        
+        .begonia .petal {
+            position: absolute;
+            width: 25px;
+            height: 35px;
+            background: #f08080;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        }
+        
+        .begonia .leaf {
+            position: absolute;
+            width: 40px;
+            height: 25px;
+            background: #558b2f;
+            border-radius: 50%;
+        }
+        
+        /* 添加海棠花瓣和花朵 */
+        .begonia .flower:nth-child(3) { top: 40px; left: 40%; }
+        .begonia .flower:nth-child(4) { top: 60px; left: 65%; }
+        .begonia .flower:nth-child(5) { top: 85px; left: 45%; }
+        
+        .begonia .petal:nth-child(6) { top: 34px; left: 33%; transform: rotate(-30deg); }
+        .begonia .petal:nth-child(7) { top: 34px; left: 47%; transform: rotate(30deg); }
+        .begonia .petal:nth-child(8) { top: 54px; left: 58%; transform: rotate(-15deg); }
+        .begonia .petal:nth-child(9) { top: 54px; left: 72%; transform: rotate(15deg); }
+        .begonia .petal:nth-child(10) { top: 79px; left: 38%; transform: rotate(-25deg); }
+        .begonia .petal:nth-child(11) { top: 79px; left: 52%; transform: rotate(25deg); }
+        
+        .begonia .leaf:nth-child(12) { top: 100px; left: 30px; transform: rotate(-30deg); }
+        .begonia .leaf:nth-child(13) { top: 110px; right: 30px; transform: rotate(30deg); }
+        
+        /* 桃花图形 */
+        .peach {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .peach .branch {
+            position: absolute;
+            width: 5px;
+            height: 130px;
+            background: #8b4513;
+            left: 50%;
+            transform: translateX(-50%) rotate(15deg);
+            top: 40px;
+        }
+        
+        .peach .branch:nth-child(2) {
+            transform: translateX(-30%) rotate(-10deg);
+            height: 100px;
+            width: 4px;
+        }
+        
+        .peach .branch:nth-child(3) {
+            transform: translateX(20%) rotate(25deg);
+            height: 110px;
+            width: 3px;
+            top: 50px;
+        }
+        
+        .peach .flower {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: #ffb7c5;
+            border-radius: 50%;
+        }
+        
+        .peach .petal {
+            position: absolute;
+            width: 20px;
+            height: 25px;
+            background: #ffb7c5;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        }
+        
+        /* 添加桃花花朵和花瓣 */
+        .peach .flower:nth-child(4) { top: 30px; left: 40%; }
+        .peach .flower:nth-child(5) { top: 55px; left: 60%; }
+        .peach .flower:nth-child(6) { top: 80px; left: 35%; }
+        .peach .flower:nth-child(7) { top: 40px; left: 65%; }
+        .peach .flower:nth-child(8) { top: 65px; left: 30%; }
+        .peach .flower:nth-child(9) { top: 90px; left: 55%; }
+        .peach .flower:nth-child(10) { top: 45px; left: 25%; }
+        
+        .peach .petal:nth-child(11) { top: 25px; left: 35%; transform: rotate(-30deg); }
+        .peach .petal:nth-child(12) { top: 25px; left: 45%; transform: rotate(30deg); }
+        .peach .petal:nth-child(13) { top: 50px; left: 55%; transform: rotate(-15deg); }
+        .peach .petal:nth-child(14) { top: 50px; left: 65%; transform: rotate(15deg); }
+        .peach .petal:nth-child(15) { top: 75px; left: 30%; transform: rotate(-25deg); }
+        .peach .petal:nth-child(16) { top: 75px; left: 40%; transform: rotate(25deg); }
+
+        /* 壁纸生成相关样式 */
+        .wallpaper-section {
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 2px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .wallpaper-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .wallpaper-styles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .style-option {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--secondary-color);
+        }
+        
+        .style-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .style-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(165, 63, 63, 0.1);
+        }
+        
+        .style-preview {
+            width: 60px;
+            height: 80px;
+            margin: 0 auto 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .style-name {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        
+        /* 背景样式预览 */
+        .style-classic { background: linear-gradient(to bottom, #f4f1e8, #eae4d3, #ddd4c0); }
+        .style-ink { background: linear-gradient(to bottom, #e8f4f8, #d4e7ed, #c0d8e0); }
+        .style-elegant { background: linear-gradient(to bottom, #f8f8f8, #eeeeee, #e0e0e0); }
+        .style-sunset { background: linear-gradient(to bottom, #ffeaa7, #fab1a0, #e17055); }
+        .style-bamboo { background: linear-gradient(to bottom, #d5f4e6, #81ecec, #74b9ff); }
+        .style-dark { background: linear-gradient(to bottom, #2d3436, #636e72, #74b9ff); }
+        
+        .wallpaper-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .wallpaper-btn:hover {
+            background-color: #8a3232;
+            transform: translateY(-2px);
+        }
+        
+        .wallpaper-preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .wallpaper-canvas {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .download-btn {
+            margin-top: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .download-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .modal-content {
+            background-color: var(--secondary-color);
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .modal-styles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .modal-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .modal-generate-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .modal-generate-btn:hover {
+            background-color: #8a3232;
+        }
+
+        .modal-generate-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .modal-cancel-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .modal-cancel-btn:hover {
+            background-color: #5a6268;
+        }
+
+        /* 壁纸预览在弹窗中 */
+        .modal-wallpaper-preview {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        /* 音乐控制样式 */
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .music-button {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(212, 102, 156, 0.9), rgba(142, 69, 133, 0.9));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(212, 102, 156, 0.4);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        .progress-dot.active {
-            background: linear-gradient(135deg, #5D5CDE, #667eea);
-            transform: scale(1.2);
+        .music-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(212, 102, 156, 0.5);
+            background: linear-gradient(135deg, rgba(184, 84, 138, 0.9), rgba(122, 53, 114, 0.9));
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-            100% { transform: scale(1); }
+        .volume-panel {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: linear-gradient(135deg, rgba(253, 247, 240, 0.95), rgba(249, 240, 232, 0.95));
+            border: 1px solid rgba(212, 165, 116, 0.6);
+            border-radius: 15px;
+            padding: 20px 15px;
+            box-shadow: 0 8px 32px rgba(212, 102, 156, 0.2);
+            backdrop-filter: blur(10px);
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            min-width: 80px;
         }
 
-        .correct-animation {
-            animation: pulse 0.6s ease-in-out;
+        .volume-panel.show {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
         }
-        
-        .card-style-classic {
-            background: linear-gradient(135deg, #f4f1e8 0%, #e8dcc0 100%);
-            border: 2px solid #8B4513;
+
+        .volume-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
         }
-        
-        .card-style-ink {
-            background: linear-gradient(135deg, #f8f8f8 0%, #e0e0e0 100%);
-            border: 2px solid #333;
+
+        .volume-label {
+            font-size: 12px;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-weight: 500;
         }
-        
-        .card-style-elegant {
-            background: linear-gradient(135deg, #fff 0%, #f0f8ff 100%);
-            border: 2px solid #4682b4;
+
+        #volume-slider {
+            writing-mode: bt-lr; /* IE */
+            -webkit-appearance: slider-vertical; /* Webkit */
+            width: 8px;
+            height: 100px;
+            outline: none;
+            background: linear-gradient(to top, #ddd, var(--primary-color));
+            border-radius: 4px;
+            cursor: pointer;
         }
-        
-        .card-style-sunset {
-            background: linear-gradient(135deg, #ffe4e1 0%, #ffd4c4 100%);
-            border: 2px solid #cd853f;
+
+        #volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-        
-        .card-style-bamboo {
-            background: linear-gradient(135deg, #f0fff0 0%, #e6ffe6 100%);
-            border: 2px solid #228b22;
+
+        #volume-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-        
-        .card-style-dark {
-            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
-            border: 2px solid #8b7355;
-            color: #f0f0f0;
+
+        .music-toggle {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            margin: 0 auto;
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(212, 102, 156, 0.4);
+        }
+
+        /* 暗黑模式下的音乐控制 */
+        .dark .volume-panel {
+            background: linear-gradient(135deg, rgba(77, 66, 56, 0.95), rgba(99, 86, 72, 0.95));
+            border-color: rgba(99, 86, 72, 0.6);
+        }
+
+        /* 移动端适配 */
+        @media screen and (max-width: 600px) {
+            .music-control {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .music-button {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .volume-panel {
+                bottom: 60px;
+                padding: 15px 12px;
+            }
+
+            #volume-slider {
+                height: 80px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+            
+            .modal-styles {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <div class="container mx-auto px-4 py-6 max-w-md">
-        <!-- 头部 -->
-        <div class="flex justify-center items-center mb-4">
-            <span class="game-title">意</span>
-            <span class="emoji-title">emoji</span>
-            <span class="text-gray-600 ml-2">七下诗词意象配对</span>
+<body>
+    <!-- 背景音乐音频元素 -->
+    <audio id="background-music" loop preload="auto">
+        <source src="https://pfst.cf2.poecdn.net/base/audio/2e3837d85756485c0b171d11fb30040afd3ae5e1e44bc60e93fc40019efc9ee5" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio>
+
+    <!-- 音乐控制界面 -->
+    <div class="music-control" id="music-control">
+        <div class="music-button" id="music-button" title="音乐控制">🌸</div>
+        <div class="volume-panel" id="volume-panel">
+            <div class="volume-control">
+                <input type="range" id="volume-slider" min="0" max="100" value="50" orient="vertical">
+                <div class="volume-label">音量</div>
+            </div>
+            <div class="music-toggle" id="music-toggle" title="播放/暂停">⏯️</div>
+        </div>
+    </div>
+
+    <div class="scroll-container">
+        <!-- 开始页面 -->
+        <div id="start-screen">
+            <h1>草木有本心</h1>
+            <p>中国传统文化中，植物常被赋予特定的品格象征。通过这个测试，你可以了解自己与哪种传统植物的品格最为相似，并且认识与该植物有深厚联系的历史人物。</p>
+            <p>测试共有12道题目，请根据自己的真实想法选择最符合的选项。完成后，你将获得个性化的植物人格分析。</p>
+            <p>本测试旨在帮助你更好地理解《爱莲说》等经典文学作品中植物的象征意义，以及中国传统文化的审美与价值观念。</p>
+            <button id="start-btn" class="btn">开始测试</button>
         </div>
 
-        <!-- 进度指示器和倒计时 -->
-        <div class="flex justify-between items-center mb-3">
-            <div class="progress-container flex space-x-2">
-                <div id="progress-text" class="text-sm text-primary mr-2">剩余机会：3</div>
-                <div id="progress-dots" class="flex">
-                    <!-- 进度点由JS动态生成 -->
+        <!-- 问题页面 -->
+        <div id="question-screen" class="hidden">
+            <h1>中国传统植物人格测试</h1>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div id="progress-text" class="progress-text">问题 1/12</div>
+            </div>
+            
+            <div id="question-container" class="question-container">
+                <!-- 问题内容将通过 JavaScript 动态加载 -->
+            </div>
+            
+            <button id="next-btn" class="btn">下一题</button>
+        </div>
+
+        <!-- 结果页面 -->
+        <div id="result-screen" class="hidden">
+            <h1>测试结果</h1>
+            
+            <div id="result-container" class="result-container">
+                <!-- 结果内容将通过 JavaScript 动态加载 -->
+            </div>
+            
+            <button id="restart-btn" class="btn restart-btn">重新测试</button>
+        </div>
+    </div>
+
+    <!-- 壁纸样式选择弹窗 -->
+    <div id="wallpaper-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeWallpaperModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title">选择壁纸样式</h2>
+                <p>请选择您喜欢的壁纸背景样式：</p>
+            </div>
+            
+            <div class="modal-styles">
+                <div class="style-option" onclick="selectModalStyle('classic')">
+                    <div class="style-preview style-classic"></div>
+                    <div class="style-name">典雅古风</div>
+                </div>
+                <div class="style-option" onclick="selectModalStyle('ink')">
+                    <div class="style-preview style-ink"></div>
+                    <div class="style-name">水墨风韵</div>
+                </div>
+                <div class="style-option" onclick="selectModalStyle('elegant')">
+                    <div class="style-preview style-elegant"></div>
+                    <div class="style-name">清雅绝尘</div>
+                </div>
+                <div class="style-option" onclick="selectModalStyle('sunset')">
+                    <div class="style-preview style-sunset"></div>
+                    <div class="style-name">落霞飞雁</div>
+                </div>
+                <div class="style-option" onclick="selectModalStyle('bamboo')">
+                    <div class="style-preview style-bamboo"></div>
+                    <div class="style-name">青竹如茵</div>
+                </div>
+                <div class="style-option" onclick="selectModalStyle('dark')">
+                    <div class="style-preview style-dark"></div>
+                    <div class="style-name">墨韵流芳</div>
                 </div>
             </div>
-            <div id="current-score" class="text-sm font-medium text-primary">得分：0</div>
-        </div>
-        
-        <!-- 倒计时 -->
-        <div class="mb-6">
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-sm font-medium text-gray-700">时间剩余：<span id="countdown-text">20</span>秒</span>
-                <span id="countdown-warning" class="text-xs text-red-500 hidden">时间即将结束！</span>
+            
+            <div class="modal-actions">
+                <button class="modal-generate-btn" id="modal-generate-btn" onclick="generateModalWallpaper()" disabled>生成壁纸</button>
+                <button class="modal-cancel-btn" onclick="closeWallpaperModal()">取消</button>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-3 shadow-inner">
-                <div id="countdown-bar" class="bg-gradient-to-r from-primary to-purple-400 h-3 rounded-full transition-all duration-1000" style="width: 100%"></div>
-            </div>
-        </div>
-
-        <!-- 诗歌展示 -->
-        <div class="bg-white rounded-xl p-6 mb-6 border-2 border-primary relative shadow-lg">
-            <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary -mt-1 -ml-1 rounded-tl-lg"></div>
-            <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary -mb-1 -mr-1 rounded-br-lg"></div>
-            <p id="poem-text" class="text-lg text-center mb-3 leading-relaxed text-gray-800"></p>
-            <p id="poem-source" class="text-sm text-gray-600 text-center font-medium"></p>
-        </div>
-
-        <!-- Emoji选择网格 -->
-        <div id="emoji-grid" class="grid grid-cols-3 gap-4 mb-6">
-            <!-- Emoji卡片由JS动态生成 -->
-        </div>
-
-        <!-- 按钮区域 -->
-        <div class="flex space-x-4 mb-6">
-            <button id="generate-card" class="flex-1 bg-gradient-to-r from-primary to-purple-400 text-white py-3 px-4 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform transition-all duration-200 hover:scale-105">
-                🎨 制作壁纸
-            </button>
-            <button id="next-poem" class="flex-1 bg-gradient-to-r from-green-400 to-blue-400 text-white py-3 px-4 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform transition-all duration-200 hover:scale-105">
-                下一首 →
-            </button>
-        </div>
-
-        <!-- 解释区域 -->
-        <div id="explanation" class="bg-gradient-to-r from-indigo-100 to-purple-100 border-l-4 border-primary p-4 rounded-lg mb-6 hidden shadow-md">
-            <p id="explanation-text" class="text-sm text-gray-700 leading-relaxed"></p>
-        </div>
-
-        <!-- 游戏统计 -->
-        <div class="flex justify-between text-sm text-gray-600 border-t border-gray-200 pt-4">
-            <div>
-                <span class="font-medium">最高连击</span>
-                <span id="max-combo" class="ml-2 text-primary font-bold">0</span>
-            </div>
-            <div>
-                <span class="font-medium">平均时间</span>
-                <span id="avg-time" class="ml-2 text-primary font-bold">0s</span>
-            </div>
-            <div>
-                <span class="font-medium">详情</span>
-                <span class="ml-2">ℹ️</span>
-            </div>
-        </div>
-
-        <!-- 壁纸制作模态框 -->
-        <div id="card-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-screen overflow-y-auto">
-                <!-- 标题 -->
-                <div class="p-4 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-center flex items-center justify-center">
-                        <span class="game-title mr-2">意</span>
-                        <span class="emoji-title mr-2">emoji</span>
-                        <span class="text-gray-600">壁纸制作</span>
-                    </h2>
-                </div>
-                
-                <!-- 风格选择 -->
-                <div class="p-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-3">选择风格</h3>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button class="style-btn card-style-classic p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="classic">
-                            <div class="text-lg mb-1">📜</div>
-                            典雅古风
-                        </button>
-                        <button class="style-btn card-style-ink p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="ink">
-                            <div class="text-lg mb-1">🖋️</div>
-                            水墨风韵
-                        </button>
-                        <button class="style-btn card-style-elegant p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="elegant">
-                            <div class="text-lg mb-1">☁️</div>
-                            清雅绝尘
-                        </button>
-                        <button class="style-btn card-style-sunset p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="sunset">
-                            <div class="text-lg mb-1">🌅</div>
-                            落霞飞雁
-                        </button>
-                        <button class="style-btn card-style-bamboo p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="bamboo">
-                            <div class="text-lg mb-1">🎋</div>
-                            青竹如茵
-                        </button>
-                        <button class="style-btn card-style-dark p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="dark">
-                            <div class="text-lg mb-1">🌃</div>
-                            墨韵流芳
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- 预览区 -->
-                <div class="p-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-3">预览效果 (9:16)</h3>
-                    <div id="wallpaper-preview" class="mx-auto bg-white rounded-lg shadow-lg overflow-hidden" style="width: 180px; height: 320px; transform: scale(0.8); transform-origin: top;">
-                        <div id="wallpaper-content" class="card-style-classic w-full h-full relative p-4 flex flex-col justify-between" style="width: 180px; height: 320px;">
-                            <!-- 装饰边框 -->
-                            <div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2" style="border-color: inherit;"></div>
-                            <div class="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2" style="border-color: inherit;"></div>
-                            <div class="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2" style="border-color: inherit;"></div>
-                            <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2" style="border-color: inherit;"></div>
-                            
-                            <!-- 诗歌内容区域 -->
-                            <div class="flex-1 flex justify-center items-center">
-                                <!-- 两列诗句布局 -->
-                                <div id="preview-poem" class="flex justify-center space-x-4 text-sm leading-relaxed font-chinese h-full items-center"></div>
-                            </div>
-                            
-                            <!-- 底部信息 -->
-                            <div class="absolute bottom-4 left-4">
-                                <!-- 作者信息（竖排在左下角） -->
-                                <div id="preview-source" class="text-xs text-gray-600 font-chinese"></div>
-                            </div>
-                            
-                            <!-- 品牌标识（右下角） -->
-                            <div class="absolute bottom-4 right-4">
-                                <div class="bg-red-800 text-white px-2 py-1 text-xs rounded">
-                                    <span class="game-title text-xs">意</span><span class="emoji-title text-xs">emoji</span>
-                                </div>
-                            </div>
-                            
-                            <!-- 隐藏的emoji区域 -->
-                            <div id="preview-emojis" style="display: none;"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 操作按钮 -->
-                <div class="p-4 border-t border-gray-200">
-                    <div class="flex space-x-3">
-                        <button id="close-modal" class="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-xl font-medium hover:bg-gray-200 transition-colors">
-                            取消
-                        </button>
-                        <button id="download-wallpaper" class="flex-1 bg-gradient-to-r from-primary to-purple-400 text-white py-3 px-4 rounded-xl font-medium hover:from-purple-500 hover:to-primary transition-all">
-                            📱 下载壁纸
-                        </button>
-                    </div>
+            
+            <div class="modal-wallpaper-preview" id="modal-wallpaper-preview">
+                <canvas id="modal-wallpaper-canvas" class="wallpaper-canvas" width="1080" height="1920"></canvas>
+                <div>
+                    <button class="download-btn" onclick="downloadModalWallpaper()">下载壁纸</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // 检测暗黑模式
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
 
-        // 游戏数据
-        const poems = [
+        // 测试数据
+        const questions = [
             {
-                text: "谁家玉笛暗飞声，散入春风满洛城。\n此夜曲中闻折柳，何人不起故园情。",
-                source: "春夜洛城闻笛·李白",
-                correctEmojis: [
-                    { emoji: "🎵", meaning: "玉笛/笛声" },
-                    { emoji: "🍃", meaning: "春风" },
-                    { emoji: "🏙️", meaning: "洛城/城市" },
-                    { emoji: "🏡", meaning: "故园/思乡" }
-                ],
-                explanation: "这首诗描绘了春夜里笛声在洛阳城中飘荡的场景，引发了诗人的思乡之情。意象包括玉笛(🎵)、春风(🍃)、洛城(🏙️)和思乡之情(🏡)。"
+                question: "放假时，你最喜欢去哪里放松？",
+                options: [
+                    { text: "湖边或水上公园，欣赏荷花和水景", scores: { lotus: 3, chrysanthemum: 0, peony: 0, bamboo: 1, plum: 0, pine: 0, azalea: 0, begonia: 0, peach: 1 } },
+                    { text: "乡间田野，感受宁静的自然风光", scores: { lotus: 0, chrysanthemum: 3, peony: 0, bamboo: 0, plum: 1, pine: 0, azalea: 0, begonia: 1, peach: 2 } },
+                    { text: "观赏花卉的公园，欣赏争奇斗艳的花朵", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 0, plum: 1, pine: 0, azalea: 2, begonia: 3, peach: 3 } },
+                    { text: "山林或原始森林，感受大自然的力量", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 1, plum: 0, pine: 3, azalea: 3, begonia: 0, peach: 1 } }
+                ]
             },
             {
-                text: "草树知春不久归，百般红紫斗芳菲。\n杨花榆荚无才思，惟解漫天作雪飞。",
-                source: "晚春·韩愈",
-                correctEmojis: [
-                    { emoji: "🌿", meaning: "草树/植物" },
-                    { emoji: "🌸", meaning: "花朵/芳菲" },
-                    { emoji: "🌱", meaning: "杨花/榆荚" },
-                    { emoji: "❄️", meaning: "飘雪/漫天飞舞" }
-                ],
-                explanation: "这首诗描绘了晚春时节的景象，各种花卉争奇斗艳，而杨花和榆荚虽无才情却漫天飞舞如雪。意象包括草树(🌿)、花朵(🌸)、杨花榆荚(🌱)和飘雪(❄️)。"
+                question: "面对困难时，你通常会怎么做？",
+                options: [
+                    { text: "超然物外，保持内心平静，寻找最佳解决方案", scores: { lotus: 3, chrysanthemum: 0, peony: 0, bamboo: 1, plum: 0, pine: 1, azalea: 0, begonia: 0, peach: 1 } },
+                    { text: "弯而不折，灵活调整自己的计划", scores: { lotus: 0, chrysanthemum: 1, peony: 0, bamboo: 3, plum: 0, pine: 0, azalea: 1, begonia: 1, peach: 2 } },
+                    { text: "热情奔放地迎战，展现自信与勇气", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 1, plum: 0, pine: 2, azalea: 3, begonia: 1, peach: 1 } },
+                    { text: "在逆境中坚韧不拔，越挫越勇，傲然挺立", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 3, pine: 1, azalea: 1, begonia: 0, peach: 0 } }
+                ]
             },
             {
-                text: "黄梅时节家家雨，青草池塘处处蛙。\n有约不来过夜半，闲敲棋子落灯花。",
-                source: "约客·赵师秀",
-                correctEmojis: [
-                    { emoji: "🌧️", meaning: "梅雨/雨水" },
-                    { emoji: "🐸", meaning: "青蛙/蛙声" },
-                    { emoji: "♟️", meaning: "棋子" },
-                    { emoji: "🕯️", meaning: "灯花/灯烛" }
-                ],
-                explanation: "这首诗描写了梅雨季节等待友人不至的情景。意象包括梅雨(🌧️)、青蛙(🐸)、棋子(♟️)和灯花(🕯️)，表达了诗人的孤独和期待。"
+                question: "你认为自己最大的优点是什么？",
+                options: [
+                    { text: "心灵纯净，不随波逐流，坚守原则", scores: { lotus: 3, chrysanthemum: 1, peony: 0, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 0, peach: 0 } },
+                    { text: "面对困难坚韧不拔，有很强的意志力", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 1, plum: 3, pine: 1, azalea: 1, begonia: 0, peach: 0 } },
+                    { text: "华丽大方，善于表达，有很强的表现力", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 2, peach: 1 } },
+                    { text: "情感丰富，充满人文关怀，心系他人", scores: { lotus: 0, chrysanthemum: 0, peony: 1, bamboo: 0, plum: 0, pine: 0, azalea: 3, begonia: 3 } }
+                ]
             },
             {
-                text: "故园东望路漫漫，双袖龙钟泪不干。\n马上相逢无纸笔，凭君传语报平安。",
-                source: "逢入京使·岑参",
-                correctEmojis: [
-                    { emoji: "🏡", meaning: "故乡/故园" },
-                    { emoji: "😢", meaning: "泪水/思念" },
-                    { emoji: "🐎", meaning: "马匹/旅途" },
-                    { emoji: "💌", meaning: "信息/传语" }
-                ],
-                explanation: "这首诗描述了诗人在异乡遇到进京使者的情景，表达了对家乡的思念之情。意象包括故园(🏡)、泪水(😢)、马匹(🐎)和传信(💌)。"
+                question: "在人际交往中，你更倾向于？",
+                options: [
+                    { text: "独处自在，与知己相处融洽，不喜喧闹", scores: { lotus: 1, chrysanthemum: 3, peony: 0, bamboo: 0, plum: 1, pine: 0, azalea: 0, begonia: 0, peach: 0 } },
+                    { text: "广交朋友，成为社交中心，享受热闹", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 1, plum: 0, pine: 0, azalea: 1, begonia: 2, peach: 2 } },
+                    { text: "保持适度社交，重质不重量，深度交流", scores: { lotus: 3, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 0, pine: 1, azalea: 0, begonia: 0, peach: 1 } },
+                    { text: "情感丰富细腻，善于倾听和表达关怀", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 1, pine: 0, azalea: 3, begonia: 3 } }
+                ]
             },
             {
-                text: "浩荡离愁白日斜，吟鞭东指即天涯。\n落红不是无情物，化作春泥更护花。",
-                source: "己亥杂诗·龚自珍",
-                correctEmojis: [
-                    { emoji: "🌇", meaning: "夕阳/白日斜" },
-                    { emoji: "🧳", meaning: "远行/天涯" },
-                    { emoji: "🥀", meaning: "落花/落红" },
-                    { emoji: "🌱", meaning: "春泥/土壤" }
-                ],
-                explanation: "这首诗表达了诗人离愁和对未来的展望。最后两句落红不是无情物，化作春泥更护花尤为著名。意象包括夕阳(🌇)、远行(🧳)、落花(🥀)和春泥(🌱)。"
+                question: "你喜欢什么样的艺术风格？",
+                options: [
+                    { text: "简约清雅，寓意深远的水墨画", scores: { lotus: 3, chrysanthemum: 1, peony: 0, bamboo: 2, plum: 2, pine: 0, azalea: 0, begonia: 0 } },
+                    { text: "色彩丰富，热烈奔放的油画", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 0, plum: 0, pine: 0, azalea: 3, begonia: 2 } },
+                    { text: "充满诗意，韵味深长的词赋", scores: { lotus: 1, chrysanthemum: 2, peony: 0, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 3 } },
+                    { text: "气势恢宏，坚韧有力的雕塑", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 1, plum: 1, pine: 3, azalea: 2, begonia: 0 } }
+                ]
             },
             {
-                text: "莫笑农家腊酒浑，丰年留客足鸡豚。\n山重水复疑无路，柳暗花明又一村。",
-                source: "游山西村·陆游",
-                correctEmojis: [
-                    { emoji: "🏘️", meaning: "农家/村庄" },
-                    { emoji: "🏞️", meaning: "山水/山路" },
-                    { emoji: "🌳", meaning: "柳树" },
-                    { emoji: "🌸", meaning: "花朵/明亮" }
-                ],
-                explanation: "这首诗描绘了诗人游览山村的情景，其中山重水复疑无路，柳暗花明又一村成为了千古名句。意象包括农家(🏘️)、山水(🏞️)、柳树(🌳)和花朵(🌸)。"
+                question: "你如何看待名利？",
+                options: [
+                    { text: "追求内心平静，不为外物所扰，超然脱俗", scores: { lotus: 3, chrysanthemum: 2, peony: 0, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 0, peach: 0 } },
+                    { text: "追求卓越成就和社会认可，雍容华贵", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 1, plum: 0, pine: 0, azalea: 1, begonia: 1, peach: 1 } },
+                    { text: "有原则地追求理想，不屈从世俗，坚持正义", scores: { lotus: 1, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 2, pine: 0, azalea: 3, begonia: 0, peach: 0 } },
+                    { text: "看重精神价值，但也享受生活的美好", scores: { lotus: 0, chrysanthemum: 1, peony: 1, bamboo: 3, plum: 1, pine: 2, azalea: 0, begonia: 3 } }
+                ]
             },
             {
-                text: "绿槐高柳咽新蝉。薰风初入弦。\n碧纱窗下水沈烟。棋声惊昼眠。",
-                source: "阮郎归 初夏·苏轼",
-                correctEmojis: [
-                    { emoji: "🦗", meaning: "蝉/蝉鸣" },
-                    { emoji: "🍃", meaning: "微风/薰风" },
-                    { emoji: "♟️", meaning: "下棋/棋声" },
-                    { emoji: "😴", meaning: "昼眠/午睡" }
-                ],
-                explanation: "这首词描绘了初夏时节的景象，包括蝉鸣(🦗)、薰风(🍃)、棋声(♟️)和昼眠(😴)，营造出一种悠闲恬静的初夏氛围。"
+                question: "面对挫折和失败，你的态度是？",
+                options: [
+                    { text: "坚忍不拔，从不轻言放弃，如雪中挺立", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 1, plum: 2, pine: 3, azalea: 1, begonia: 0, peach: 0 } },
+                    { text: "保持内心平静，以智慧解困，出污泥而不染", scores: { lotus: 3, chrysanthemum: 0, peony: 0, bamboo: 1, plum: 0, pine: 0, azalea: 0, begonia: 0, peach: 0 } },
+                    { text: "情感充沛，有时会感伤，但最终能重新振作", scores: { lotus: 0, chrysanthemum: 0, peony: 1, bamboo: 0, plum: 0, pine: 0, azalea: 2, begonia: 3 } },
+                    { text: "如梅花傲雪，在逆境中寻找生机，重新绽放", scores: { lotus: 0, chrysanthemum: 2, peony: 0, bamboo: 2, plum: 3, pine: 1, azalea: 0, begonia: 0 } }
+                ]
             },
             {
-                text: "梅子金黄杏子肥，麦花雪白菜花稀。\n日长篱落无人过，惟有蜻蜓蛱蝶飞。",
-                source: "夏日田园杂兴十二绝（其一）·范成大",
-                correctEmojis: [
-                    { emoji: "🍑", meaning: "果实/梅杏" },
-                    { emoji: "🌾", meaning: "麦花/菜花" },
-                    { emoji: "🌄", meaning: "篱笆/田园" },
-                    { emoji: "🦋", meaning: "蜻蜓/蝴蝶" }
-                ],
-                explanation: "这首诗描绘了夏日田园的静谧景象，成熟的果实、盛开的花朵和飞舞的昆虫构成了一幅生动的乡村图景。意象包括果实(🍑)、麦花(🌾)、田园(🌄)和蜻蜓蝴蝶(🦋)。"
+                question: "你更喜欢哪种季节的景色？",
+                options: [
+                    { text: "夏季的荷塘，荷花亭亭玉立于水中", scores: { lotus: 3, chrysanthemum: 0, peony: 1, bamboo: 1, plum: 0, pine: 0, azalea: 0, begonia: 0 } },
+                    { text: "秋季的田野，菊花傲霜怒放", scores: { lotus: 0, chrysanthemum: 3, peony: 0, bamboo: 0, plum: 0, pine: 1, azalea: 0, begonia: 0 } },
+                    { text: "春天的山坡，漫山遍野的杜鹃花盛开", scores: { lotus: 0, chrysanthemum: 0, peony: 1, bamboo: 0, plum: 0, pine: 0, azalea: 3, begonia: 2 } },
+                    { text: "冬天的雪景，梅花与松树在雪中傲然挺立", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 3, pine: 3, azalea: 0, begonia: 0 } }
+                ]
             },
             {
-                text: "独坐幽篁里，弹琴复长啸。\n深林人不知，明月来相照。",
-                source: "竹里馆·王维",
-                correctEmojis: [
-                    { emoji: "🎋", meaning: "竹林/幽篁" },
-                    { emoji: "🎻", meaning: "琴/音乐" },
-                    { emoji: "🌲", meaning: "深林/独处" },
-                    { emoji: "🌕", meaning: "明月" }
-                ],
-                explanation: "这首诗描述了诗人独自在竹林中弹琴长啸，与自然融为一体的意境。意象包括竹林(🎋)、琴声(🎻)、深林(🌲)和明月(🌕)，表达了诗人隐逸的心境。"
+                question: "你怎样看待人生中的挑战？",
+                options: [
+                    { text: "挑战是磨练意志的机会，让人更加坚强", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 1, plum: 2, pine: 3, azalea: 1, begonia: 0 } },
+                    { text: "不因外物而动摇本心，保持超然态度", scores: { lotus: 3, chrysanthemum: 1, peony: 0, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 0 } },
+                    { text: "面对不公正挑战时仍坚守自己的信念和尊严", scores: { lotus: 1, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 2, pine: 0, azalea: 3, begonia: 0 } },
+                    { text: "在挑战中体验生活的丰富性和情感深度", scores: { lotus: 0, chrysanthemum: 0, peony: 2, bamboo: 0, plum: 0, pine: 0, azalea: 1, begonia: 3 } }
+                ]
             },
             {
-                text: "烟笼寒水月笼沙，夜泊秦淮近酒家。\n商女不知亡国恨，隔江犹唱后庭花。",
-                source: "泊秦淮·杜牧",
-                correctEmojis: [
-                    { emoji: "🌫️", meaning: "水雾/烟笼" },
-                    { emoji: "🌙", meaning: "月光/月色" },
-                    { emoji: "🚣", meaning: "船只/夜泊" },
-                    { emoji: "🎵", meaning: "歌声/唱曲" }
-                ],
-                explanation: "这首诗描绘了诗人夜泊秦淮河畔的所见所感，表达了对国家命运的忧思。意象包括水雾(🌫️)、月光(🌙)、船只(🚣)和歌声(🎵)。"
+                question: "你最欣赏哪种品质？",
+                options: [
+                    { text: "高洁品德，不与世俗同流合污，保持纯净", scores: { lotus: 3, chrysanthemum: 1, peony: 0, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 0, peach: 0 } },
+                    { text: "坚韧不拔，百折不挠的精神品质", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 3, pine: 3, azalea: 1, begonia: 0, peach: 0 } },
+                    { text: "炽热的爱国精神和不畏强权的勇气", scores: { lotus: 0, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 1, pine: 0, azalea: 3, begonia: 0, peach: 0 } },
+                    { text: "丰富深刻的情感表达和艺术天赋", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 3, peach: 1 } }
+                ]
             },
             {
-                text: "飞来山上千寻塔，闻说鸡鸣见日升。\n不畏浮云遮望眼，自缘身在最高层。",
-                source: "登飞来峰·王安石",
-                correctEmojis: [
-                    { emoji: "🏔️", meaning: "高山/峰顶" },
-                    { emoji: "🗼", meaning: "塔楼/千寻塔" },
-                    { emoji: "🌅", meaning: "日出/日升" },
-                    { emoji: "☁️", meaning: "浮云" }
-                ],
-                explanation: "这首诗描述了诗人登上飞来峰俯瞰大地的情景，表达了一种高瞻远瞩的胸怀。意象包括高山(🏔️)、塔楼(🗼)、日出(🌅)和浮云(☁️)。"
+                question: "在工作或学习中，你更注重？",
+                options: [
+                    { text: "专注于深度和精益求精，持之以恒", scores: { lotus: 2, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 0, pine: 3, azalea: 0, begonia: 0, peach: 0 } },
+                    { text: "保持灵活，追求创新与突破", scores: { lotus: 0, chrysanthemum: 1, peony: 0, bamboo: 3, plum: 1, pine: 0, azalea: 1, begonia: 0, peach: 2 } },
+                    { text: "注重表现与成果，展现华丽风采", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 1, peach: 1 } },
+                    { text: "充满感情与热情地投入工作", scores: { lotus: 0, chrysanthemum: 0, peony: 1, bamboo: 0, plum: 0, pine: 0, azalea: 3, begonia: 3, peach: 2 } }
+                ]
             },
             {
-                text: "宣室求贤访逐臣，贾生才调更无伦。\n可怜夜半虚前席，不问苍生问鬼神。",
-                source: "贾生·李商隐",
-                correctEmojis: [
-                    { emoji: "🏛️", meaning: "宫殿/宣室" },
-                    { emoji: "🌃", meaning: "夜晚/夜半" },
-                    { emoji: "👻", meaning: "鬼神/迷信" }
-                ],
-                explanation: "这首诗通过贾谊的故事，批评了统治者不重视贤才、迷信鬼神的行为。意象包括宫殿(🏛️)、夜晚(🌃)和鬼神(👻)。"
-            },
-            {
-                text: "莫言下岭便无难，赚得行人错喜欢。\n政入万山围子里，一山放出一山拦。",
-                source: "过松源晨炊漆公店（其五）·杨万里",
-                correctEmojis: [
-                    { emoji: "⛰️", meaning: "山岭/下岭" },
-                    { emoji: "🚶", meaning: "旅人/行人" },
-                    { emoji: "🏞️", meaning: "山路/山围" },
-                    { emoji: "🚧", meaning: "障碍/拦阻" }
-                ],
-                explanation: "这首诗描述了翻山越岭的艰难历程，一座山过去后又是一座山，寓意人生道路的曲折。意象包括山岭(⛰️)、旅人(🚶)、山路(🏞️)和障碍(🚧)。"
-            },
-            {
-                text: "前不见古人，后不见来者。\n念天地之悠悠，独怆然而涕下！",
-                source: "登幽州台歌·陈子昂",
-                correctEmojis: [
-                    { emoji: "⏳", meaning: "古今/时间" },
-                    { emoji: "🌏", meaning: "广阔/天地" },
-                    { emoji: "🧍", meaning: "孤独/独立" },
-                    { emoji: "😢", meaning: "悲伤/泪下" }
-                ],
-                explanation: "这首诗表达了诗人面对浩瀚时空的孤独感和对人生短暂的悲叹。意象包括时间流逝(⏳)、天地广阔(🌏)、孤独感(🧍)和悲伤情绪(😢)。"
+                question: "如果你是一种颜色，你会是？",
+                options: [
+                    { text: "清雅的粉白色，代表纯洁与高雅", scores: { lotus: 3, chrysanthemum: 0, peony: 0, bamboo: 0, plum: 1, pine: 0, azalea: 0, begonia: 0, peach: 1 } },
+                    { text: "热烈的鲜红色，代表热情与活力", scores: { lotus: 0, chrysanthemum: 0, peony: 3, bamboo: 0, plum: 0, pine: 0, azalea: 3, begonia: 1, peach: 0 } },
+                    { text: "清新的翠绿色，代表生机与希望", scores: { lotus: 0, chrysanthemum: 1, peony: 0, bamboo: 3, plum: 0, pine: 1, azalea: 0, begonia: 0, peach: 2 } },
+                    { text: "柔美的淡粉色，代表温柔与忧愁", scores: { lotus: 0, chrysanthemum: 0, peony: 1, bamboo: 0, plum: 0, pine: 0, azalea: 0, begonia: 3, peach: 3 } }
+                ]
             }
         ];
 
-        // 干扰emoji库
-        const distractorEmojis = [
-            "😀", "😎", "🌈", "🐍", "🦊", "🌹", "🍁", "🌻", "🐢", "🐟", 
-            "🦁", "🐯", "🦆", "☔", "⚡", "❤️", "🔥", "🎭", "🎬", "📚", 
-            "⏰", "🎁", "🏆", "🎮", "🚗", "🚂", "✈️", "🚀", "🎪", "🏝️"
-        ];
-
-        // 游戏状态
-        let gameState = {
-            currentPoemIndex: 0,
-            selectedEmojis: [],
-            score: 0,
-            maxCombo: 0,
-            currentCombo: 0,
-            startTime: null,
-            totalTime: 0,
-            completedPoems: 0,
-            lives: 3,
-            countdownTime: 20,
-            countdownInterval: null,
-            isPoemCompleted: false
+        // 植物资料
+        const plants = {
+            lotus: {
+                name: "莲花",
+                englishName: "Lotus",
+                person: "周敦颐",
+                image: `<div class="lotus">
+                            <div class="center"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                        </div>`,
+                features: "莲花出淤泥而不染，生于水中却不为水所污。其花色多为粉白，花瓣层层展开，中央金黄色花蕊，根茎生于水底泥中，叶大而圆，托出水面。莲花可全株利用，是中国传统的观赏与食用植物。",
+                symbolism: "莲花象征高洁品格、纯净心灵和超凡脱俗的气质。周敦颐在《爱莲说》中赞美莲花身处污浊却能保持纯洁的品质。选择莲花的你，心灵纯净，不随波逐流，即使身处复杂环境也能坚守自己的原则和信念。",
+                poem: "《爱莲说》 - 周敦颐\n予独爱莲之出淤泥而不染，濯清涟而不妖，中通外直，不蔓不枝，香远益清，亭亭净植，可远观而不可亵玩焉。"
+            },
+            chrysanthemum: {
+                name: "菊花",
+                englishName: "Chrysanthemum",
+                person: "陶渊明",
+                image: `<div class="chrysanthemum">
+                            <div class="center"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="stem"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                        </div>`,
+                features: "菊花品种繁多，颜色各异，有黄、白、紫等色。花瓣细长，围绕中心呈放射状排列。菊花在寒秋时节盛开，经霜而不凋，是中国传统的秋季花卉代表。",
+                symbolism: "菊花象征高洁品格和坚韧不拔的精神。东晋诗人陶渊明隐居田园，以菊为伴，崇尚简朴自然的生活。选择菊花的你，淡泊名利，追求内心的平静与满足，不为外界纷扰所动。你向往简单纯粹的生活，懂得在平凡中发现美好。",
+                poem: "《饮酒》 - 陶渊明\n结庐在人境，而无车马喧。问君何能尔？心远地自偏。采菊东篱下，悠然见南山。山气日夕佳，飞鸟相与还。此中有真意，欲辨已忘言。"
+            },
+            peony: {
+                name: "牡丹",
+                englishName: "Peony",
+                person: "杨贵妃",
+                image: `<div class="peony">
+                            <div class="center"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="stem"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                        </div>`,
+                features: "牡丹花大色艳，以红、粉、白、紫等色为主。花瓣丰满厚实，层层叠叠。叶片呈深绿色，茎干粗壮。牡丹在春季盛开，姿态雍容华贵。",
+                symbolism: "牡丹象征富贵、荣华与美丽。唐代杨贵妃极爱牡丹，曾在长安城建造牡丹园。选择牡丹的你，性格开朗大方，热爱生活，不惧展示自己的才华与魅力。你有追求卓越的决心，渴望成就精彩人生，同时也懂得欣赏美好事物，享受生活的乐趣。",
+                poem: "《清平调·其一》 - 李白\n云想衣裳花想容，春风拂槛露华浓。若非群玉山头见，会向瑶台月下逢。"
+            },
+            bamboo: {
+                name: "竹子",
+                englishName: "Bamboo",
+                person: "苏轼",
+                image: `<div class="bamboo">
+                            <div class="stalk"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="node"></div>
+                            <div class="node"></div>
+                            <div class="node"></div>
+                            <div class="node"></div>
+                        </div>`,
+                features: "竹子四季常青，茎干挺直，节节向上，有明显的竹节。叶片细长，翠绿色，簌簌作响。竹子生长迅速，适应性强，能在各种环境中茁壮成长。",
+                symbolism: "竹子象征正直、谦虚和坚韧。北宋文学家苏轼曾表达了对竹子的喜爱，认为生活中不可缺少竹子的高雅气质。选择竹子的你，为人正直坦荡，虚怀若谷，能容纳不同观点。你适应力强，遇到困难能够迅速调整自己，保持内心的平衡与韧性。",
+                poem: "《于潜僧绿筠轩》 - 苏轼\n可使食无肉，不可使居无竹。无肉令人瘦，无竹令人俗。人瘦尚可肥，士俗不可医。"
+            },
+            plum: {
+                name: "梅花",
+                englishName: "Plum Blossom",
+                person: "林逋",
+                image: `<div class="plum">
+                            <div class="branch"></div>
+                            <div class="branch"></div>
+                            <div class="branch"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                        </div>`,
+                features: "梅花多为白色或粉红色，花瓣五片，简洁素雅。梅树枝干苍劲有力，呈不规则曲折状。梅花在寒冬盛开，傲雪凌霜，是中国传统的岁寒三友（松、竹、梅）之一。",
+                symbolism: "梅花象征坚韧不拔、百折不挠的精神。北宋隐逸诗人林逋在杭州西湖隐居，种梅养鹤，过着宁静诗意的生活。选择梅花的你，拥有坚强的意志和不畏困难的勇气，同时向往宁静淡雅的生活，在逆境中能保持乐观向上的态度。",
+                poem: "《山园小梅》 - 林逋\n疏影横斜水清浅，暗香浮动月黄昏。"
+            },
+            pine: {
+                name: "松树",
+                englishName: "Pine",
+                person: "杜甫",
+                image: `<div class="pine">
+                            <div class="trunk"></div>
+                            <div class="branch"></div>
+                            <div class="branch"></div>
+                            <div class="branch"></div>
+                            <div class="branch"></div>
+                        </div>`,
+                features: "松树常年苍翠，树干挺直粗壮，树皮呈深褐色。松针细长，常年不落。松树生命力极强，能在恶劣环境中生存，寿命悠长，是中国传统的长寿象征。",
+                symbolism: "松树象征坚韧不拔、不畏艰难的品格。唐代诗人杜甫一生颠沛流离，却始终关心国家命运，其精神如同松树般挺立不倒。选择松树的你，性格坚毅沉稳，有责任感和使命感。你面对困难时能够泰然处之，持之以恒地追求自己的目标，展现出超越常人的毅力与勇气。",
+                poem: "《望岳》 - 杜甫\n岱宗夫如何？齐鲁青未了。造化钟神秀，阴阳割昏晓。荡胸生层云，决眦入归鸟。会当凌绝顶，一览众山小。"
+            },
+            azalea: {
+                name: "杜鹃花",
+                englishName: "Azalea",
+                person: "李商隐",
+                image: `<div class="azalea">
+                            <div class="center"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="stem"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                        </div>`,
+                features: "杜鹃花色彩艳丽，有红、粉、白、紫等色，花期较长。传说杜鹃花是杜鹃鸟啼血所化，因此又有许多美丽的别名。杜鹃花能在恶劣环境中生长，适应性强，常见于山坡上。",
+                symbolism: "杜鹃花象征不屈的爱国精神、悲壮美与情感丰富。唐代诗人李商隐在《锦瑟》中以'望帝春心托杜鹃'抒发深沉的情感。选择杜鹃花的你，拥有强烈的情感与人文关怀，心系家国，即使面对不公正的待遇也能坚守自己的理想和信念。",
+                poem: "《锦瑟》 - 李商隐\n庄生晓梦迷蝴蝶，望帝春心托杜鹃。沧海月明珠有泪，蓝田日暖玉生烟。"
+            },
+            begonia: {
+                name: "海棠",
+                englishName: "Begonia",
+                person: "李清照",
+                image: `<div class="begonia">
+                            <div class="branch"></div>
+                            <div class="branch"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="leaf"></div>
+                            <div class="leaf"></div>
+                        </div>`,
+                features: "海棠花姿优美，花朵色彩艳丽，多为红色或粉色，春季开花。与桃花相似但更加丰腴华贵，有花中神仙之称。海棠花期虽短，却极为娇美，常被用来比喻美人。",
+                symbolism: "海棠花象征细腻的情感与对美好事物的珍惜。宋代女词人李清照善于捕捉生活中的细微美好，其词作情感真挚细腻。选择海棠的你，感情丰富敏感，善于观察生活中的美好与忧伤，在敏感中保持坚韧，追求完美的艺术与情感表达。",
+                poem: "《如梦令》 - 李清照\n昨夜雨疏风骤，浓睡不消残酒。试问卷帘人，却道海棠依旧。知否，知否？应是绿肥红瘦。"
+            },
+            peach: {
+                name: "桃花",
+                englishName: "Peach Blossom",
+                person: "白居易",
+                image: `<div class="peach">
+                            <div class="branch"></div>
+                            <div class="branch"></div>
+                            <div class="branch"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="flower"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                        </div>`,
+                features: "桃花花瓣五片，色彩从淡粉到深红不等，春季盛开。桃花是春天的使者，象征着生机与希望。花期虽短，但开放时极为绚烂美丽，给人以强烈的视觉冲击。",
+                symbolism: "桃花象征希望、重新发现美好和乐观向上的精神。唐代诗人白居易在困境中仍能发现生活的美好，保持积极的心态。选择桃花的你，乐观向上，对生活充满热爱和希望，善于在平凡中发现不平凡的美好，即使在困境中也能保持积极的心态。",
+                poem: "《大林寺桃花》 - 白居易\n人间四月芳菲尽，山寺桃花始盛开。长恨春归无觅处，不知转入此中来。"
+            }
         };
 
-        // DOM元素
-        const poemTextElement = document.getElementById('poem-text');
-        const poemSourceElement = document.getElementById('poem-source');
-        const emojiGridElement = document.getElementById('emoji-grid');
-        const explanationElement = document.getElementById('explanation');
-        const explanationTextElement = document.getElementById('explanation-text');
-        const generateCardButton = document.getElementById('generate-card');
-        const nextPoemButton = document.getElementById('next-poem');
-        const currentScoreElement = document.getElementById('current-score');
-        const progressTextElement = document.getElementById('progress-text');
-        const progressDotsElement = document.getElementById('progress-dots');
-        const maxComboElement = document.getElementById('max-combo');
-        const avgTimeElement = document.getElementById('avg-time');
-        const cardModal = document.getElementById('card-modal');
-        const cardPoemElement = document.getElementById('card-poem');
-        const cardSourceElement = document.getElementById('card-source');
-        const cardEmojisElement = document.getElementById('card-emojis');
-        const cardExplanationElement = document.getElementById('card-explanation');
-        const closeModalButton = document.getElementById('close-modal');
-        const saveCardButton = document.getElementById('save-card');
+        // 全局变量
+        let currentQuestion = 0;
+        let scores = {
+            lotus: 0,
+            chrysanthemum: 0,
+            peony: 0,
+            bamboo: 0,
+            plum: 0,
+            pine: 0,
+            azalea: 0,
+            begonia: 0,
+            peach: 0
+        };
+        let userResult = '';
 
-        // 初始化游戏
-        function initializeGame() {
-            // 随机打乱诗歌顺序
-            shuffleArray(poems);
-            
-            // 创建进度点
-            createProgressDots();
-            
-            // 加载第一首诗
-            loadPoem(0);
-            
-            // 禁用"生成卡片"按钮，直到完成当前诗的匹配
-            generateCardButton.disabled = true;
-            
-            // 添加按钮事件监听器
-            generateCardButton.addEventListener('click', showCardModal);
-            nextPoemButton.addEventListener('click', loadNextPoem);
-            closeModalButton.addEventListener('click', hideCardModal);
-            document.getElementById('download-wallpaper').addEventListener('click', downloadWallpaper);
-            
-            // 记录开始时间
-            gameState.startTime = new Date();
+        // DOM 元素
+        const startScreen = document.getElementById('start-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionContainer = document.getElementById('question-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const resultContainer = document.getElementById('result-container');
+        const nextBtn = document.getElementById('next-btn');
+
+        // 按钮事件
+        document.getElementById('start-btn').addEventListener('click', startTest);
+        nextBtn.addEventListener('click', nextQuestion);
+        document.getElementById('restart-btn').addEventListener('click', restartTest);
+
+        // 开始测试
+        function startTest() {
+            startScreen.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            loadQuestion(0);
         }
 
-        // 创建进度点
-        function createProgressDots() {
-            progressDotsElement.innerHTML = '';
-            for (let i = 0; i < Math.min(poems.length, 5); i++) {
-                const dot = document.createElement('div');
-                dot.className = 'progress-dot';
-                if (i === 0) dot.classList.add('active');
-                progressDotsElement.appendChild(dot);
-            }
-        }
-
-        // 更新进度点
-        function updateProgressDots() {
-            const dots = progressDotsElement.querySelectorAll('.progress-dot');
-            const visibleDots = Math.min(poems.length, 5);
-            const currentPosition = gameState.currentPoemIndex % visibleDots;
-            
-            dots.forEach((dot, index) => {
-                dot.classList.remove('active');
-                if (index === currentPosition) {
-                    dot.classList.add('active');
-                }
-            });
-        }
-
-        // 倒计时相关元素
-        const countdownTextElement = document.getElementById('countdown-text');
-        const countdownBarElement = document.getElementById('countdown-bar');
-        const countdownWarningElement = document.getElementById('countdown-warning');
-        
-        // 加载诗歌
-        function loadPoem(index) {
-            const poem = poems[index];
-            
-            // 更新诗歌文本和来源
-            poemTextElement.innerHTML = poem.text.replace(/\n/g, '<br>');
-            poemSourceElement.textContent = poem.source;
-            
-            // 重置选中的emoji
-            gameState.selectedEmojis = [];
-            
-            // 生成emoji网格
-            generateEmojiGrid(poem);
-            
-            // 隐藏解释
-            explanationElement.classList.add('hidden');
-            
-            // 禁用"生成卡片"按钮
-            generateCardButton.disabled = true;
-            
-            // 如果是最后一首诗，禁用"下一首"按钮
-            nextPoemButton.disabled = index >= poems.length - 1;
+        // 加载问题
+        function loadQuestion(index) {
+            const question = questions[index];
             
             // 更新进度
-            updateProgressDots();
+            progressFill.style.width = `${((index + 1) / questions.length) * 100}%`;
+            progressText.textContent = `问题 ${index + 1}/${questions.length}`;
             
-            // 重置并启动倒计时
-            resetCountdown();
-            startCountdown();
+            // 创建问题内容
+            let questionHTML = `
+                <div class="question">${question.question}</div>
+                <div class="options-grid">
+            `;
             
-            // 重置诗歌完成状态
-            gameState.isPoemCompleted = false;
-        }
-        
-        // 启动倒计时
-        function startCountdown() {
-            // 清除之前的计时器（如果有）
-            if (gameState.countdownInterval) {
-                clearInterval(gameState.countdownInterval);
-            }
-            
-            // 重置计时器状态
-            gameState.countdownTime = 20;
-            updateCountdownDisplay();
-            
-            // 设置新的计时器
-            gameState.countdownInterval = setInterval(() => {
-                gameState.countdownTime--;
-                updateCountdownDisplay();
-                
-                // 当时间剩余5秒时显示警告
-                if (gameState.countdownTime <= 5) {
-                    countdownWarningElement.classList.remove('hidden');
-                    countdownBarElement.classList.add('bg-red-500');
-                    countdownBarElement.classList.remove('bg-primary');
-                }
-                
-                // 时间用完
-                if (gameState.countdownTime <= 0) {
-                    clearInterval(gameState.countdownInterval);
-                    handleTimeUp();
-                }
-            }, 1000);
-        }
-        
-        // 更新倒计时显示
-        function updateCountdownDisplay() {
-            // 更新文字显示
-            countdownTextElement.textContent = gameState.countdownTime;
-            
-            // 更新进度条
-            const percentage = (gameState.countdownTime / 20) * 100;
-            countdownBarElement.style.width = `${percentage}%`;
-        }
-        
-        // 重置倒计时显示
-        function resetCountdown() {
-            gameState.countdownTime = 20;
-            countdownTextElement.textContent = "20";
-            countdownBarElement.style.width = "100%";
-            countdownWarningElement.classList.add('hidden');
-            countdownBarElement.classList.remove('bg-red-500');
-            countdownBarElement.classList.add('bg-primary');
-        }
-        
-        // 处理时间用完
-        function handleTimeUp() {
-            // 如果诗歌已经完成了，不做任何处理
-            if (gameState.isPoemCompleted) return;
-            
-            // 根据已匹配的正确emoji数量给予部分分数
-            const poem = poems[gameState.currentPoemIndex];
-            const correctEmojis = poem.correctEmojis.map(item => item.emoji);
-            const correctMatches = gameState.selectedEmojis.filter(emoji => correctEmojis.includes(emoji)).length;
-            
-            // 每个正确匹配得5分（而不是完成全部匹配时的10分/个）
-            const partialScore = correctMatches * 5;
-            gameState.score += partialScore;
-            
-            // 重置连击
-            gameState.currentCombo = 0;
-            
-            // 显示解释和正确答案
-            explanationElement.classList.remove('hidden');
-            explanationTextElement.textContent = `时间到！你匹配了${correctMatches}个正确意象。` + poem.explanation;
-            
-            // 在网格中标记所有正确答案
-            const emojiCards = emojiGridElement.querySelectorAll('.emoji-card');
-            emojiCards.forEach(card => {
-                const emoji = card.dataset.emoji;
-                if (correctEmojis.includes(emoji) && !gameState.selectedEmojis.includes(emoji)) {
-                    // 高亮显示未选中的正确答案
-                    card.classList.add('bg-yellow-200');
-                    card.classList.add('border-2');
-                    card.classList.add('border-primary');
-                }
+            // 添加选项
+            question.options.forEach((option, optionIndex) => {
+                questionHTML += `
+                    <label class="option">
+                        <input type="radio" name="question-${index}" value="${optionIndex}" />
+                        ${option.text}
+                    </label>
+                `;
             });
             
-            // 启用"生成卡片"和"下一首"按钮
-            generateCardButton.disabled = false;
+            questionHTML += `</div>`;
             
-            // 标记当前诗歌已完成
-            gameState.isPoemCompleted = true;
+            questionContainer.innerHTML = questionHTML;
             
-            // 更新UI
-            updateUI();
-        }
-        
-        // 停止倒计时
-        function stopCountdown() {
-            if (gameState.countdownInterval) {
-                clearInterval(gameState.countdownInterval);
-                gameState.countdownInterval = null;
-            }
-        }
-
-        // 生成emoji网格
-        function generateEmojiGrid(poem) {
-            emojiGridElement.innerHTML = '';
-            
-            // 获取正确的emoji
-            const correctEmojis = poem.correctEmojis.map(item => item.emoji);
-            
-            // 创建包含正确emoji和干扰emoji的数组
-            const allEmojis = [...correctEmojis];
-            
-            // 添加干扰emoji，直到总数达到12个
-            while (allEmojis.length < 12) {
-                const randomIndex = Math.floor(Math.random() * distractorEmojis.length);
-                const distractor = distractorEmojis[randomIndex];
-                if (!allEmojis.includes(distractor)) {
-                    allEmojis.push(distractor);
-                }
-            }
-            
-            // 打乱emoji顺序
-            shuffleArray(allEmojis);
-            
-            // 创建emoji卡片
-            allEmojis.forEach(emoji => {
-                const card = document.createElement('div');
-                card.className = 'emoji-card bg-white shadow-md rounded-lg flex items-center justify-center p-4 cursor-pointer text-4xl';
-                card.textContent = emoji;
-                card.dataset.emoji = emoji;
-                
-                // 添加点击事件
-                card.addEventListener('click', () => handleEmojiClick(card, emoji, poem));
-                
-                emojiGridElement.appendChild(card);
-            });
-        }
-
-        // 处理emoji点击
-        function handleEmojiClick(card, emoji, poem) {
-            // 检查是否已经选中
-            if (card.classList.contains('selected')) {
-                // 取消选中
-                card.classList.remove('selected');
-                gameState.selectedEmojis = gameState.selectedEmojis.filter(e => e !== emoji);
-            } else {
-                // 选中
-                const correctEmojis = poem.correctEmojis.map(item => item.emoji);
-                
-                if (correctEmojis.includes(emoji)) {
-                    // 正确答案
-                    card.classList.add('selected');
-                    gameState.selectedEmojis.push(emoji);
-                    
-                    // 添加动画
-                    card.classList.add('correct-animation');
-                    setTimeout(() => {
-                        card.classList.remove('correct-animation');
-                    }, 500);
-                    
-                    // 更新分数和连击
-                    gameState.score += 10;
-                    gameState.currentCombo++;
-                    if (gameState.currentCombo > gameState.maxCombo) {
-                        gameState.maxCombo = gameState.currentCombo;
-                    }
-                    
-                    // 检查是否完成当前诗的所有正确匹配
-                    if (correctEmojis.every(e => gameState.selectedEmojis.includes(e))) {
-                        // 停止倒计时
-                        stopCountdown();
-                        
-                        // 显示解释
-                        explanationElement.classList.remove('hidden');
-                        explanationTextElement.textContent = poem.explanation;
-                        
-                        // 启用"生成卡片"按钮
-                        generateCardButton.disabled = false;
-                        
-                        // 标记当前诗歌已完成
-                        gameState.isPoemCompleted = true;
-                        
-                        // 计算额外的时间奖励（剩余时间 × 2）
-                        const timeBonus = gameState.countdownTime * 2;
-                        gameState.score += timeBonus;
-                        
-                        // 更新解释文本，包含时间奖励信息
-                        explanationTextElement.textContent = `太棒了！你成功匹配了所有意象，获得时间奖励 ${timeBonus} 分！\n` + poem.explanation;
-                    }
-                } else {
-                    // 错误答案
-                    gameState.currentCombo = 0;
-                    gameState.lives--;
-                    
-                    // 卡片短暂闪烁
-                    card.classList.add('bg-red-200');
-                    setTimeout(() => {
-                        card.classList.remove('bg-red-200');
-                    }, 300);
-                    
-                    // 如果没有生命值，游戏结束
-                    if (gameState.lives <= 0) {
-                        endGame();
-                    }
-                }
-                
-                // 更新UI
-                updateUI();
-            }
-        }
-
-        // 更新UI
-        function updateUI() {
-            currentScoreElement.textContent = `得分：${gameState.score}`;
-            progressTextElement.textContent = `剩余机会：${gameState.lives}`;
-            maxComboElement.textContent = gameState.maxCombo;
-            
-            if (gameState.completedPoems > 0) {
-                const avgTimeInSeconds = Math.round(gameState.totalTime / gameState.completedPoems);
-                avgTimeElement.textContent = `${avgTimeInSeconds}s`;
-            }
-        }
-
-        // 加载下一首诗
-        function loadNextPoem() {
-            // 停止当前倒计时
-            stopCountdown();
-            
-            // 记录完成时间
-            const now = new Date();
-            const timeTaken = (now - gameState.startTime) / 1000; // 秒
-            gameState.totalTime += timeTaken;
-            gameState.completedPoems++;
-            
-            // 重置开始时间
-            gameState.startTime = now;
-            
-            // 前进到下一首诗
-            gameState.currentPoemIndex++;
-            
-            if (gameState.currentPoemIndex < poems.length) {
-                loadPoem(gameState.currentPoemIndex);
-            } else {
-                // 游戏结束
-                endGame();
-            }
-        }
-
-        // 结束游戏
-        function endGame() {
-            if (gameState.lives <= 0) {
-                alert(`游戏结束！\n\n你的最终得分是：${gameState.score}\n最高连击：${gameState.maxCombo}`);
-            } else {
-                alert(`恭喜！你完成了所有诗歌的配对！\n\n最终得分：${gameState.score}\n最高连击：${gameState.maxCombo}`);
-            }
-            
-            // 重新开始游戏
-            resetGame();
-        }
-
-        // 重置游戏
-        function resetGame() {
-            // 停止任何正在运行的倒计时
-            stopCountdown();
-            
-            gameState = {
-                currentPoemIndex: 0,
-                selectedEmojis: [],
-                score: 0,
-                maxCombo: 0,
-                currentCombo: 0,
-                startTime: new Date(),
-                totalTime: 0,
-                completedPoems: 0,
-                lives: 3,
-                countdownTime: 20,
-                countdownInterval: null,
-                isPoemCompleted: false
-            };
-            
-            shuffleArray(poems);
-            createProgressDots();
-            loadPoem(0);
-            updateUI();
-        }
-
-        // 壁纸制作相关变量
-        let currentWallpaperStyle = 'classic';
-        
-        // 显示壁纸制作模态框
-        function showCardModal() {
-            const poem = poems[gameState.currentPoemIndex];
-            
-            // 更新预览内容
-            updateWallpaperPreview(poem);
-            
-            // 显示模态框
-            cardModal.classList.remove('hidden');
-            
-            // 初始化风格选择器
-            initializeStyleSelector();
-        }
-
-        // 初始化风格选择器
-        function initializeStyleSelector() {
-            const styleButtons = document.querySelectorAll('.style-btn');
-            
-            styleButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    // 移除所有active样式
-                    styleButtons.forEach(btn => btn.classList.remove('ring-2', 'ring-primary'));
-                    
-                    // 添加active样式到当前按钮
-                    button.classList.add('ring-2', 'ring-primary');
-                    
-                    // 更新当前风格
-                    currentWallpaperStyle = button.dataset.style;
-                    
-                    // 更新预览
-                    const poem = poems[gameState.currentPoemIndex];
-                    updateWallpaperPreview(poem);
+            // 添加选项点击事件
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    nextBtn.disabled = false;
                 });
             });
             
-            // 默认选择第一个风格
-            if (styleButtons.length > 0) {
-                styleButtons[0].classList.add('ring-2', 'ring-primary');
+            // 禁用下一题按钮，直到用户选择选项
+            nextBtn.disabled = true;
+        }
+
+        // 下一题
+        function nextQuestion() {
+            // 获取用户选择
+            const selectedOption = document.querySelector(`input[name="question-${currentQuestion}"]:checked`);
+            
+            if (selectedOption) {
+                const optionIndex = parseInt(selectedOption.value);
+                const selectedScores = questions[currentQuestion].options[optionIndex].scores;
+                
+                // 更新分数
+                for (const plant in selectedScores) {
+                    scores[plant] += selectedScores[plant];
+                }
+                
+                currentQuestion++;
+                
+                if (currentQuestion < questions.length) {
+                    loadQuestion(currentQuestion);
+                } else {
+                    showResult();
+                }
             }
         }
 
-        // 更新壁纸预览
-        function updateWallpaperPreview(poem) {
-            const wallpaperContent = document.getElementById('wallpaper-content');
-            const previewPoem = document.getElementById('preview-poem');
-            const previewSource = document.getElementById('preview-source');
-            const previewEmojis = document.getElementById('preview-emojis');
+        // 显示结果
+        function showResult() {
+            questionScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
             
-            // 更新风格类 - 9:16比例的布局
-            wallpaperContent.className = `card-style-${currentWallpaperStyle} w-full h-full relative p-4 flex flex-col justify-center`;
+            // 找出得分最高的植物
+            let maxScore = 0;
+            let resultPlant = '';
             
-            // 格式化诗歌文本 - 古籍方式由右至左竖排版，每句诗一列
-            const poemLines = poem.text.split('\n');
+            for (const plant in scores) {
+                if (scores[plant] > maxScore) {
+                    maxScore = scores[plant];
+                    resultPlant = plant;
+                }
+            }
             
-            previewPoem.innerHTML = `
-                <div class="flex justify-center items-center h-full">
-                    <!-- 古籍式排版：从右到左 -->
-                    <div class="flex items-center space-x-2" style="flex-direction: row-reverse;">
-                        ${poemLines.map(line => `
-                            <div class="flex flex-col text-center" style="writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 0.05em; font-family: 'STXingkai', 'STKaiti', 'KaiTi', 'SimKai', serif;">
-                                ${line.split('').map(char => `<span class="block text-xs leading-tight">${char}</span>`).join('')}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-            
-            // 设置作者信息为竖排（将放在左下角）
-            const [title, author] = poem.source.split('·');
-            previewSource.innerHTML = `
-                <div class="flex space-x-1" style="flex-direction: row-reverse;">
-                    <div class="flex flex-col text-center" style="writing-mode: vertical-rl; text-orientation: upright; font-family: 'STXingkai', 'STKaiti', 'KaiTi', 'SimKai', serif;">
-                        ${author ? author.split('').map(char => `<span class="block text-xs">${char}</span>`).join('') : ''}
-                    </div>
-                    <div class="flex flex-col text-center" style="writing-mode: vertical-rl; text-orientation: upright; font-family: 'STXingkai', 'STKaiti', 'KaiTi', 'SimKai', serif;">
-                        ${title.split('').map(char => `<span class="block text-xs">${char}</span>`).join('')}
-                    </div>
-                </div>
-            `;
-            
-            // 隐藏emoji意象（不在壁纸中显示）
-            previewEmojis.innerHTML = '';
-            previewEmojis.style.display = 'none';
+            userResult = resultPlant;
+            showPlantResult(resultPlant);
         }
 
-        // 隐藏壁纸模态框
-        function hideCardModal() {
-            cardModal.classList.add('hidden');
+        // 显示植物结果
+        function showPlantResult(plantKey) {
+            const result = plants[plantKey];
+            
+            // 构建结果HTML
+            let resultHTML = `
+                <div class="plant-image" id="${plantKey}-image">
+                    ${result.image}
+                </div>
+                <div class="plant-title">你的植物人格：${result.name} ${result.englishName}</div>
+                <div class="person-name">对应历史人物：${result.person}</div>
+                <h3>植物特征</h3>
+                <div class="plant-description">${result.features}</div>
+                <h3>人格象征</h3>
+                <div class="plant-symbolism">${result.symbolism}</div>
+                
+                <div class="wallpaper-section">
+                    <div class="wallpaper-buttons">
+                        <button class="wallpaper-btn" onclick="openWallpaperModal('${plantKey}')">生成诗句壁纸</button>
+                    </div>
+                </div>
+
+
+            `;
+            
+            resultContainer.innerHTML = resultHTML;
+        }
+
+        // 全局变量存储选中的样式
+        let selectedWallpaperStyle = '';
+
+        // 选择样式
+        function selectStyle(plantKey, style) {
+            // 移除之前的选中状态
+            document.querySelectorAll('.style-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // 添加当前选中状态
+            event.target.closest('.style-option').classList.add('selected');
+            
+            // 保存选中的样式
+            selectedWallpaperStyle = style;
+            
+            // 启用生成按钮
+            document.getElementById(`generate-btn-${plantKey}`).disabled = false;
+        }
+
+        // 获取样式配置
+        function getStyleConfig(style) {
+            const configs = {
+                classic: {
+                    background: ['#f4f1e8', '#eae4d3', '#ddd4c0'],
+                    borderColor: '#8b7355',
+                    innerBorderColor: '#a89780',
+                    textColor: '#2c1810'
+                },
+                ink: {
+                    background: ['#e8f4f8', '#d4e7ed', '#c0d8e0'],
+                    borderColor: '#5a6c7d',
+                    innerBorderColor: '#7a8d9c',
+                    textColor: '#1a2530'
+                },
+                elegant: {
+                    background: ['#f8f8f8', '#eeeeee', '#e0e0e0'],
+                    borderColor: '#999999',
+                    innerBorderColor: '#bbbbbb',
+                    textColor: '#333333'
+                },
+                sunset: {
+                    background: ['#ffeaa7', '#fab1a0', '#e17055'],
+                    borderColor: '#d63031',
+                    innerBorderColor: '#e84393',
+                    textColor: '#2d3436'
+                },
+                bamboo: {
+                    background: ['#d5f4e6', '#81ecec', '#74b9ff'],
+                    borderColor: '#00b894',
+                    innerBorderColor: '#00cec9',
+                    textColor: '#2d3436'
+                },
+                dark: {
+                    background: ['#2d3436', '#636e72', '#74b9ff'],
+                    borderColor: '#ddd',
+                    innerBorderColor: '#bbb',
+                    textColor: '#ffffff'
+                }
+            };
+            return configs[style] || configs.classic;
+        }
+
+        // 生成壁纸
+        function generateWallpaper(plantKey) {
+            if (!selectedWallpaperStyle) {
+                alert('请先选择壁纸样式');
+                return;
+            }
+
+            const result = plants[plantKey];
+            const canvas = document.getElementById(`wallpaper-canvas-${plantKey}`);
+            const ctx = canvas.getContext('2d');
+            const styleConfig = getStyleConfig(selectedWallpaperStyle);
+            
+            // 设置手机壁纸尺寸
+            canvas.width = 1080;
+            canvas.height = 1920;
+            
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, styleConfig.background[0]);
+            gradient.addColorStop(0.5, styleConfig.background[1]);
+            gradient.addColorStop(1, styleConfig.background[2]);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制装饰边框
+            ctx.strokeStyle = styleConfig.borderColor;
+            ctx.lineWidth = 8;
+            ctx.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
+            
+            // 内边框
+            ctx.strokeStyle = styleConfig.innerBorderColor;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(90, 90, canvas.width - 180, canvas.height - 180);
+            
+            // 设置字体和颜色
+            ctx.fillStyle = styleConfig.textColor;
+            ctx.textAlign = 'center';
+            
+            // 解析诗句
+            const poemLines = result.poem.split('\n');
+            const title = poemLines[0]; // 诗歌标题
+            const author = poemLines[0].includes(' - ') ? poemLines[0].split(' - ')[1] : '';
+            const poemContent = poemLines.slice(1).join('\n');
+            
+            // 绘制标题
+            ctx.font = 'bold 48px serif';
+            const titleParts = title.split(' - ');
+            if (titleParts.length > 1) {
+                ctx.fillText(titleParts[0], canvas.width / 2, 300);
+            } else {
+                ctx.fillText(title, canvas.width / 2, 300);
+            }
+            
+            // 绘制诗句内容（竖排文字，从右到左）
+            ctx.font = '42px serif';
+            const lines = poemContent.split('\n').filter(line => line.trim());
+            const startX = canvas.width - 200;
+            const lineSpacing = 120;
+            const charSpacing = 50;
+            
+            lines.forEach((line, lineIndex) => {
+                if (line.trim()) {
+                    const x = startX - lineIndex * lineSpacing;
+                    const chars = line.trim().split('');
+                    
+                    chars.forEach((char, charIndex) => {
+                        if (char !== '，' && char !== '。' && char !== '？' && char !== '！') {
+                            const y = 500 + charIndex * charSpacing;
+                            if (y < canvas.height - 400) {
+                                ctx.fillText(char, x, y);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // 绘制作者名（左下角）
+            ctx.font = '36px serif';
+            ctx.textAlign = 'left';
+            if (author) {
+                ctx.fillText(author, 150, canvas.height - 200);
+            }
+            
+            // 显示预览
+            document.getElementById(`wallpaper-preview-${plantKey}`).style.display = 'block';
         }
 
         // 下载壁纸
-        async function downloadWallpaper() {
-            const poem = poems[gameState.currentPoemIndex];
+        function downloadWallpaper(plantKey) {
+            const canvas = document.getElementById(`wallpaper-canvas-${plantKey}`);
+            const result = plants[plantKey];
             
-            // 显示下载提示
-            const downloadBtn = document.getElementById('download-wallpaper');
-            const originalText = downloadBtn.textContent;
-            downloadBtn.textContent = '正在生成...';
-            downloadBtn.disabled = true;
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.download = `${result.name}_${result.person}_诗句壁纸.png`;
+            link.href = canvas.toDataURL('image/png');
             
-            try {
-                // 创建高分辨率的壁纸容器 - 9:16比例（手机壁纸）
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+            // 触发下载
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 弹窗相关变量
+        let currentPlantForWallpaper = '';
+        let selectedModalStyle = '';
+
+        // 打开壁纸弹窗
+        function openWallpaperModal(plantKey) {
+            currentPlantForWallpaper = plantKey;
+            selectedModalStyle = '';
+            
+            // 重置选择状态
+            document.querySelectorAll('.modal-styles .style-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.getElementById('modal-generate-btn').disabled = true;
+            document.getElementById('modal-wallpaper-preview').style.display = 'none';
+            
+            document.getElementById('wallpaper-modal').style.display = 'block';
+        }
+
+        // 关闭壁纸弹窗
+        function closeWallpaperModal() {
+            document.getElementById('wallpaper-modal').style.display = 'none';
+        }
+
+        // 选择弹窗中的样式
+        function selectModalStyle(style) {
+            // 移除之前的选中状态
+            document.querySelectorAll('.modal-styles .style-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // 添加当前选中状态
+            event.target.closest('.style-option').classList.add('selected');
+            
+            // 保存选中的样式
+            selectedModalStyle = style;
+            
+            // 启用生成按钮
+            document.getElementById('modal-generate-btn').disabled = false;
+        }
+
+        // 在弹窗中生成壁纸
+        function generateModalWallpaper() {
+            if (!selectedModalStyle || !currentPlantForWallpaper) {
+                alert('请先选择壁纸样式');
+                return;
+            }
+
+            const result = plants[currentPlantForWallpaper];
+            const canvas = document.getElementById('modal-wallpaper-canvas');
+            const ctx = canvas.getContext('2d');
+            const styleConfig = getStyleConfig(selectedModalStyle);
+            
+            // 设置手机壁纸尺寸
+            canvas.width = 1080;
+            canvas.height = 1920;
+            
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, styleConfig.background[0]);
+            gradient.addColorStop(0.5, styleConfig.background[1]);
+            gradient.addColorStop(1, styleConfig.background[2]);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制装饰边框
+            ctx.strokeStyle = styleConfig.borderColor;
+            ctx.lineWidth = 8;
+            ctx.strokeRect(80, 80, canvas.width - 160, canvas.height - 160);
+            
+            // 内边框
+            ctx.strokeStyle = styleConfig.innerBorderColor;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(110, 110, canvas.width - 220, canvas.height - 220);
+            
+            // 设置字体和颜色（行书字体）
+            ctx.fillStyle = styleConfig.textColor;
+            
+            // 解析诗句
+            const poemLines = result.poem.split('\n');
+            const titleLine = poemLines[0]; // 诗歌标题行
+            const author = titleLine.includes(' - ') ? titleLine.split(' - ')[1] : '';
+            let title = titleLine.includes(' - ') ? titleLine.split(' - ')[0] : titleLine;
+            
+            // 去掉诗歌标题的《》符号
+            title = title.replace(/《|》/g, '');
+            
+            const poemContent = poemLines.slice(1).filter(line => line.trim());
+            
+            // 设置行书字体，根据浏览器支持情况选择字体
+            const chineseFont = '48px "KaiTi", "楷体", "STKaiti", cursive, serif';
+            ctx.font = chineseFont;
+            
+            // 中国古籍竖排版：从右到左，由上至下
+            // 按标点符号分句，每句为一列，但显示时去掉标点符号
+            
+            // 将所有诗句内容合并，然后按标点符号分句
+            const fullPoem = poemContent.join('');
+            const sentences = [];
+            let currentSentence = '';
+            
+            for (let i = 0; i < fullPoem.length; i++) {
+                const char = fullPoem[i];
                 
-                // 设置canvas尺寸 (1080x1920, 9:16比例)
-                canvas.width = 1080;
-                canvas.height = 1920;
+                // 遇到标点符号时结束当前句子，但不包含标点符号
+                if (char === '，' || char === '。' || char === '？' || char === '！' || char === '；' || char === '：') {
+                    if (currentSentence.trim()) {
+                        sentences.push(currentSentence.trim());
+                        currentSentence = '';
+                    }
+                } else {
+                    // 只添加非标点符号字符
+                    currentSentence += char;
+                }
+            }
+            
+            // 如果还有剩余内容，也加入句子数组
+            if (currentSentence.trim()) {
+                sentences.push(currentSentence.trim());
+            }
+            
+            // 设置更大的字体和更合适的间距
+            ctx.font = '56px "KaiTi", "楷体", "STKaiti", cursive, serif';
+            
+            const startX = canvas.width - 200; // 从右侧开始，往左移动避免与边框重叠
+            const topMargin = 300; // 上边距
+            const bottomMargin = 350; // 为左下角诗名和作者留空间，稍微减少
+            const lineSpacing = 140; // 竖列间距
+            const charSpacing = 68; // 字符间距
+            
+            // 针对莲花和海棠的特殊排版逻辑
+            if (currentPlantForWallpaper === 'lotus') {
+                // 莲花的特殊处理：按原文顺序，连续四字短句两个排在同一竖列
+                const groupedSentences = [];
+                let i = 0;
                 
-                // 获取当前风格的颜色配置
-                const styleConfig = {
-                    'classic': { bg: ['#f4f1e8', '#e8dcc0'], color: '#8B4513', border: '#8B4513' },
-                    'ink': { bg: ['#f8f8f8', '#e0e0e0'], color: '#333', border: '#333' },
-                    'elegant': { bg: ['#fff', '#f0f8ff'], color: '#4682b4', border: '#4682b4' },
-                    'sunset': { bg: ['#ffe4e1', '#ffd4c4'], color: '#cd853f', border: '#cd853f' },
-                    'bamboo': { bg: ['#f0fff0', '#e6ffe6'], color: '#228b22', border: '#228b22' },
-                    'dark': { bg: ['#2c2c2c', '#1a1a1a'], color: '#f0f0f0', border: '#8b7355' }
-                };
-                
-                const config = styleConfig[currentWallpaperStyle];
-                
-                // 创建渐变背景
-                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-                gradient.addColorStop(0, config.bg[0]);
-                gradient.addColorStop(1, config.bg[1]);
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // 绘制装饰边框
-                ctx.strokeStyle = config.border;
-                ctx.lineWidth = 8;
-                const borderSize = 80;
-                const margin = 40;
-                
-                // 四个角的装饰边框
-                ctx.beginPath();
-                // 左上角
-                ctx.moveTo(margin, margin + borderSize);
-                ctx.lineTo(margin, margin);
-                ctx.lineTo(margin + borderSize, margin);
-                // 右上角
-                ctx.moveTo(canvas.width - margin - borderSize, margin);
-                ctx.lineTo(canvas.width - margin, margin);
-                ctx.lineTo(canvas.width - margin, margin + borderSize);
-                // 左下角
-                ctx.moveTo(margin, canvas.height - margin - borderSize);
-                ctx.lineTo(margin, canvas.height - margin);
-                ctx.lineTo(margin + borderSize, canvas.height - margin);
-                // 右下角
-                ctx.moveTo(canvas.width - margin - borderSize, canvas.height - margin);
-                ctx.lineTo(canvas.width - margin, canvas.height - margin);
-                ctx.lineTo(canvas.width - margin, canvas.height - margin - borderSize);
-                ctx.stroke();
-                
-                // 设置字体样式（行书风格）
-                ctx.fillStyle = config.color;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                // 古籍式排版：每句诗一列，由右至左排列
-                const poemLines = poem.text.split('\n');
-                
-                // 字体大小和位置设置
-                const fontSize = 80;
-                const charSpacing = fontSize + 20;
-                const columnSpacing = 150; // 列间距
-                const startY = 200; // 调整到右上角位置
-                
-                // 计算总宽度并确定起始位置（右侧开始）
-                const totalWidth = (poemLines.length - 1) * columnSpacing;
-                const startX = canvas.width - 180; // 从右侧开始，与边框保持合适距离
-                
-                // 从右到左绘制每句诗（古籍阅读顺序）
-                poemLines.forEach((line, lineIndex) => {
-                    const chars = line.split('');
-                    const currentX = startX - lineIndex * columnSpacing;
+                while (i < sentences.length) {
+                    const currentSentence = sentences[i];
                     
-                    // 计算每列的起始Y位置（从上开始）
-                    const lineStartY = startY;
-                    
-                    chars.forEach((char, charIndex) => {
-                        ctx.font = `${fontSize}px "STXingkai", "STKaiti", "KaiTi", "SimKai", serif`;
-                        // 从上至下排列：Y坐标递增
-                        ctx.fillText(char, currentX, lineStartY + charIndex * charSpacing);
-                    });
-                });
-                
-                // 在左下角绘制诗名和作者信息（竖排）
-                const [title, author] = poem.source.split('·');
-                
-                // 动态计算布局位置，避免遮挡
-                const titleChars = title.split('');
-                const authorChars = author ? author.split('') : [];
-                
-                // 字符间距
-                const titleCharSpacing = 55;
-                const authorCharSpacing = 50;
-                
-                // 计算所需高度
-                const titleHeight = titleChars.length * titleCharSpacing;
-                const authorHeight = authorChars.length * authorCharSpacing;
-                const maxTextHeight = Math.max(titleHeight, authorHeight);
-                
-                // logo高度和间距
-                const logoHeight = 60;
-                const textToLogoGap = 40; // 文字到logo的间距
-                const logoBottomMargin = 80; // logo到底部的边距
-                
-                // 计算起始位置（从底部往上计算）
-                const logoY = canvas.height - logoBottomMargin;
-                const textBottomY = logoY - logoHeight/2 - textToLogoGap;
-                const textStartY = textBottomY - maxTextHeight;
-                
-                // 确保文字不会超出顶部边界
-                const minTextStartY = 200; // 最小起始位置
-                const finalTextStartY = Math.max(textStartY, minTextStartY);
-                
-                // 绘制作者（最左侧，从上到下）
-                if (author) {
-                    const authorX = 120;
-                    const authorStartY = finalTextStartY;
-                    
-                    ctx.font = '40px "STXingkai", "STKaiti", "KaiTi", "SimKai", serif';
-                    authorChars.forEach((char, charIndex) => {
-                        ctx.fillText(char, authorX, authorStartY + charIndex * authorCharSpacing);
-                    });
+                    // 检查当前句子是否为四字句，且下一句也是四字句
+                    if (currentSentence.length === 4 && 
+                        i + 1 < sentences.length && 
+                        sentences[i + 1].length === 4) {
+                        // 合并两个连续的四字句，中间用空格分隔
+                        groupedSentences.push(currentSentence + ' ' + sentences[i + 1]);
+                        i += 2; // 跳过下一句，因为已经合并了
+                    } else {
+                        // 单独处理非四字句或单独的四字句
+                        groupedSentences.push(currentSentence);
+                        i++;
+                    }
                 }
                 
-                // 绘制诗名（作者右侧，从上到下）
-                const titleX = 200;
-                const titleStartY = finalTextStartY;
-                
-                ctx.font = '45px "STXingkai", "STKaiti", "KaiTi", "SimKai", serif';
-                titleChars.forEach((char, charIndex) => {
-                    ctx.fillText(char, titleX, titleStartY + charIndex * titleCharSpacing);
-                });
-                
-                // 在左下角绘制品牌标识（印章效果）
-                const logoX = 160; // 位于作者和诗名中间偏右
-                
-                ctx.fillStyle = '#b91c1c';
-                ctx.fillRect(logoX - 60, logoY - 30, 120, 60);
-                ctx.fillStyle = 'white';
-                ctx.font = '24px "STKaiti", "KaiTi", "SimKai", serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('意emoji', logoX, logoY);
-                
-                // 转换为blob并下载
-                canvas.toBlob(blob => {
-                    if (blob) {
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `意emoji-${poem.source.replace(/[·\s]/g, '-')}-9x16.jpg`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(url);
+                // 绘制莲花的分组句子
+                groupedSentences.forEach((sentence, sentenceIndex) => {
+                    if (sentence.trim()) {
+                        const x = startX - sentenceIndex * lineSpacing;
+                        const chars = sentence.split('');
+                        let y = topMargin;
                         
-                        alert('壁纸下载成功！');
-                    } else {
-                        throw new Error('图片生成失败');
+                        chars.forEach((char, charIndex) => {
+                            if (char === ' ') {
+                                // 遇到空格时增加额外间距表示断句
+                                y += charSpacing * 1.5;
+                            } else {
+                                // 直接绘制字符
+                                ctx.fillText(char, x, y);
+                                y += charSpacing;
+                            }
+                            
+                            // 确保不超出底部边界
+                            if (y > canvas.height - bottomMargin) {
+                                return;
+                            }
+                        });
                     }
-                }, 'image/jpeg', 0.9);
+                });
+            } else if (currentPlantForWallpaper === 'begonia') {
+                // 海棠（李清照）的特殊处理：把"知否 知否"放在同一竖列
+                const groupedSentences = [];
+                let i = 0;
                 
-            } catch (error) {
-                console.error('生成壁纸失败:', error);
-                alert('生成壁纸失败，请重试\n错误信息：' + error.message);
-            } finally {
-                // 恢复按钮状态
-                downloadBtn.textContent = originalText;
-                downloadBtn.disabled = false;
+                while (i < sentences.length) {
+                    const currentSentence = sentences[i];
+                    
+                    // 检查是否为"知否"，且下一句也是"知否"
+                    if (currentSentence === '知否' && 
+                        i + 1 < sentences.length && 
+                        sentences[i + 1] === '知否') {
+                        // 合并两个"知否"，中间用空格分隔
+                        groupedSentences.push('知否 知否');
+                        i += 2; // 跳过下一句，因为已经合并了
+                    } else {
+                        // 单独处理其他句子
+                        groupedSentences.push(currentSentence);
+                        i++;
+                    }
+                }
+                
+                // 绘制海棠的分组句子
+                groupedSentences.forEach((sentence, sentenceIndex) => {
+                    if (sentence.trim()) {
+                        const x = startX - sentenceIndex * lineSpacing;
+                        const chars = sentence.split('');
+                        let y = topMargin;
+                        
+                        chars.forEach((char, charIndex) => {
+                            if (char === ' ') {
+                                // 遇到空格时增加额外间距表示断句
+                                y += charSpacing * 1.5;
+                            } else {
+                                // 直接绘制字符
+                                ctx.fillText(char, x, y);
+                                y += charSpacing;
+                            }
+                            
+                            // 确保不超出底部边界
+                            if (y > canvas.height - bottomMargin) {
+                                return;
+                            }
+                        });
+                    }
+                });
+            } else if (currentPlantForWallpaper === 'pine') {
+                // 松树（杜甫《望岳》）的特殊处理：8句合并成4列，每列2句
+                const groupedSentences = [];
+                
+                for (let i = 0; i < sentences.length; i += 2) {
+                    if (i + 1 < sentences.length) {
+                        // 合并相邻两句，中间用空格分隔
+                        groupedSentences.push(sentences[i] + ' ' + sentences[i + 1]);
+                    } else {
+                        // 如果是奇数句，单独处理最后一句
+                        groupedSentences.push(sentences[i]);
+                    }
+                }
+                
+                // 绘制松树的分组句子
+                groupedSentences.forEach((sentence, sentenceIndex) => {
+                    if (sentence.trim()) {
+                        const x = startX - sentenceIndex * lineSpacing;
+                        const chars = sentence.split('');
+                        let y = topMargin;
+                        
+                        chars.forEach((char, charIndex) => {
+                            if (char === ' ') {
+                                // 遇到空格时增加额外间距表示断句
+                                y += charSpacing * 1.5;
+                            } else {
+                                // 直接绘制字符
+                                ctx.fillText(char, x, y);
+                                y += charSpacing;
+                            }
+                            
+                            // 确保不超出底部边界
+                            if (y > canvas.height - bottomMargin) {
+                                return;
+                            }
+                        });
+                    }
+                });
+            } else if (currentPlantForWallpaper === 'chrysanthemum') {
+                // 菊花（陶渊明《饮酒》）的特殊处理：10句合并成5列，每列2句
+                const groupedSentences = [];
+                
+                for (let i = 0; i < sentences.length; i += 2) {
+                    if (i + 1 < sentences.length) {
+                        // 合并相邻两句，中间用空格分隔
+                        groupedSentences.push(sentences[i] + ' ' + sentences[i + 1]);
+                    } else {
+                        // 如果是奇数句，单独处理最后一句
+                        groupedSentences.push(sentences[i]);
+                    }
+                }
+                
+                // 绘制菊花的分组句子
+                groupedSentences.forEach((sentence, sentenceIndex) => {
+                    if (sentence.trim()) {
+                        const x = startX - sentenceIndex * lineSpacing;
+                        const chars = sentence.split('');
+                        let y = topMargin;
+                        
+                        chars.forEach((char, charIndex) => {
+                            if (char === ' ') {
+                                // 遇到空格时增加额外间距表示断句
+                                y += charSpacing * 1.5;
+                            } else {
+                                // 直接绘制字符
+                                ctx.fillText(char, x, y);
+                                y += charSpacing;
+                            }
+                            
+                            // 确保不超出底部边界
+                            if (y > canvas.height - bottomMargin) {
+                                return;
+                            }
+                        });
+                    }
+                });
+            } else {
+                // 其他植物的常规处理
+                sentences.forEach((sentence, sentenceIndex) => {
+                    if (sentence.trim()) {
+                        const x = startX - sentenceIndex * lineSpacing;
+                        const chars = sentence.split('');
+                        let y = topMargin;
+                        
+                        chars.forEach((char, charIndex) => {
+                            // 直接绘制字符，无需处理标点符号
+                            ctx.fillText(char, x, y);
+                            y += charSpacing;
+                            
+                            // 确保不超出底部边界
+                            if (y > canvas.height - bottomMargin) {
+                                return;
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // 绘制诗名和作者（左下角竖排）
+            ctx.font = '40px "KaiTi", "楷体", "STKaiti", cursive, serif';
+            
+            // 诗名（左下角，竖排）- 位置往上移动
+            if (title) {
+                const titleChars = title.split('');
+                let titleY = canvas.height - 400; // 往上移动100px
+                const titleX = 200;
+                
+                titleChars.forEach((char, index) => {
+                    if (titleY < canvas.height - 100) { // 确保不会太靠近底部
+                        ctx.fillText(char, titleX, titleY);
+                        titleY += 45;
+                    }
+                });
+            }
+            
+            // 作者（诗名左侧，竖排）- 位置也往上移动
+            if (author) {
+                const authorChars = author.split('');
+                let authorY = canvas.height - 400; // 往上移动100px
+                const authorX = 150;
+                
+                authorChars.forEach((char, index) => {
+                    if (authorY < canvas.height - 100) { // 确保不会太靠近底部
+                        ctx.fillText(char, authorX, authorY);
+                        authorY += 45;
+                    }
+                });
+            }
+            
+            // 绘制"琢玉"品牌印章（左下角位置）
+            const sealSize = 75;
+            const sealX = 175;
+            const sealY = canvas.height - 180;
+            
+            // 绘制印章边框（方形）
+            ctx.fillStyle = '#c8322f';
+            ctx.fillRect(sealX - sealSize/2, sealY - sealSize/2, sealSize, sealSize);
+            
+            // 绘制内部边框
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(sealX - sealSize/2 + 4, sealY - sealSize/2 + 4, sealSize - 8, sealSize - 8);
+            
+            // 绘制印章背景
+            ctx.fillStyle = '#c8322f';
+            ctx.fillRect(sealX - sealSize/2 + 6, sealY - sealSize/2 + 6, sealSize - 12, sealSize - 12);
+            
+            // 绘制"琢玉"二字（楷体风格）
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px "KaiTi", "楷体", "STKaiti", serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // "琢"字
+            ctx.fillText('琢', sealX, sealY - 12);
+            // "玉"字  
+            ctx.fillText('玉', sealX, sealY + 12);
+            
+            // 添加印章的古典纹理效果
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            ctx.fillStyle = '#a02622';
+            
+            // 添加一些古典纹理点
+            for (let i = 0; i < 20; i++) {
+                const px = sealX - 25 + Math.random() * 50;
+                const py = sealY - 25 + Math.random() * 50;
+                ctx.beginPath();
+                ctx.arc(px, py, 1, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            ctx.restore();
+            
+            // 显示预览
+            document.getElementById('modal-wallpaper-preview').style.display = 'block';
+        }
+
+        // 下载弹窗中的壁纸
+        function downloadModalWallpaper() {
+            const canvas = document.getElementById('modal-wallpaper-canvas');
+            const result = plants[currentPlantForWallpaper];
+            
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.download = `${result.name}_${result.person}_诗句壁纸_${selectedModalStyle}.png`;
+            link.href = canvas.toDataURL('image/png');
+            
+            // 触发下载
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 点击弹窗外部关闭弹窗
+        window.onclick = function(event) {
+            const modal = document.getElementById('wallpaper-modal');
+            if (event.target === modal) {
+                closeWallpaperModal();
             }
         }
 
-        // 辅助函数：打乱数组
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+        // 重新测试
+        function restartTest() {
+            currentQuestion = 0;
+            scores = {
+                lotus: 0,
+                chrysanthemum: 0,
+                peony: 0,
+                bamboo: 0,
+                plum: 0,
+                pine: 0,
+                azalea: 0,
+                begonia: 0,
+                peach: 0
+            };
+            userResult = '';
+            selectedWallpaperStyle = '';
+            selectedModalStyle = '';
+            currentPlantForWallpaper = '';
+            
+            resultScreen.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            loadQuestion(0);
+        }
+
+        // 音乐播放控制系统
+        const backgroundMusic = document.getElementById('background-music');
+        const musicButton = document.getElementById('music-button');
+        const volumePanel = document.getElementById('volume-panel');
+        const volumeSlider = document.getElementById('volume-slider');
+        const musicToggle = document.getElementById('music-toggle');
+        
+        let isPlaying = false;
+        let isVolumeVisible = false;
+
+        // 初始化音乐系统
+        function initMusicSystem() {
+            // 设置初始音量
+            backgroundMusic.volume = 0.5;
+            
+            // 尝试自动播放（现代浏览器可能会阻止）
+            const playPromise = backgroundMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // 自动播放成功
+                    isPlaying = true;
+                    updateMusicToggleIcon();
+                }).catch(error => {
+                    // 自动播放失败，显示播放按钮
+                    console.log('自动播放被阻止，需要用户交互后播放');
+                    isPlaying = false;
+                    updateMusicToggleIcon();
+                });
             }
         }
 
-        // 初始化游戏
-        initializeGame();
+        // 更新播放按钮图标
+        function updateMusicToggleIcon() {
+            musicToggle.textContent = isPlaying ? '⏸️' : '▶️';
+        }
+
+        // 音乐按钮点击事件
+        musicButton.addEventListener('click', function() {
+            isVolumeVisible = !isVolumeVisible;
+            
+            if (isVolumeVisible) {
+                volumePanel.classList.add('show');
+            } else {
+                volumePanel.classList.remove('show');
+            }
+        });
+
+        // 播放/暂停切换
+        musicToggle.addEventListener('click', function(e) {
+            e.stopPropagation(); // 防止触发父元素的点击事件
+            
+            if (isPlaying) {
+                backgroundMusic.pause();
+                isPlaying = false;
+            } else {
+                const playPromise = backgroundMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isPlaying = true;
+                    }).catch(error => {
+                        console.log('播放失败:', error);
+                    });
+                }
+            }
+            updateMusicToggleIcon();
+        });
+
+        // 音量控制
+        volumeSlider.addEventListener('input', function() {
+            const volume = this.value / 100;
+            backgroundMusic.volume = volume;
+            
+            // 如果音量大于0且音乐暂停，自动播放
+            if (volume > 0 && !isPlaying) {
+                const playPromise = backgroundMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isPlaying = true;
+                        updateMusicToggleIcon();
+                    }).catch(error => {
+                        console.log('音量调节时播放失败:', error);
+                    });
+                }
+            }
+        });
+
+        // 点击页面其他区域关闭音量面板
+        document.addEventListener('click', function(e) {
+            if (!musicButton.contains(e.target) && !volumePanel.contains(e.target)) {
+                volumePanel.classList.remove('show');
+                isVolumeVisible = false;
+            }
+        });
+
+        // 音频事件监听
+        backgroundMusic.addEventListener('play', function() {
+            isPlaying = true;
+            updateMusicToggleIcon();
+        });
+
+        backgroundMusic.addEventListener('pause', function() {
+            isPlaying = false;
+            updateMusicToggleIcon();
+        });
+
+        backgroundMusic.addEventListener('ended', function() {
+            // 由于设置了loop属性，正常情况下不会触发ended事件
+            // 但为了保险起见还是添加处理
+            isPlaying = false;
+            updateMusicToggleIcon();
+        });
+
+        // 页面加载完成后初始化音乐
+        window.addEventListener('DOMContentLoaded', function() {
+            initMusicSystem();
+        });
+
+        // 页面可见性变化时的处理
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // 页面隐藏时暂停音乐（可选）
+                // backgroundMusic.pause();
+            } else {
+                // 页面显示时恢复音乐（如果之前在播放）
+                if (isPlaying && backgroundMusic.paused) {
+                    const playPromise = backgroundMusic.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log('恢复播放失败:', error);
+                        });
+                    }
+                }
+            }
+        });
+
+        // 为开始按钮添加音乐播放触发（解决浏览器自动播放限制）
+        document.getElementById('start-btn').addEventListener('click', function() {
+            if (!isPlaying) {
+                const playPromise = backgroundMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isPlaying = true;
+                        updateMusicToggleIcon();
+                    }).catch(error => {
+                        console.log('开始测试时播放音乐失败:', error);
+                    });
+                }
+            }
+        });
     </script>
-
-
-</body></html>
+</body>
+</html>

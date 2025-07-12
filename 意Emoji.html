@@ -1,0 +1,1165 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>意moji：七下诗词意象配对</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        secondary: '#4CAF50',
+                        accent: '#E57373',
+                    },
+                    fontFamily: {
+                        'dancing': ['Dancing Script', 'cursive'],
+                        'chinese': ['STKaiti', 'KaiTi', 'SimKai', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Dancing+Script:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .game-title {
+            background: linear-gradient(45deg, #8B4513, #D2691E);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'STKaiti', 'KaiTi', 'SimKai', serif;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-right: 8px;
+        }
+        
+        .emoji-title {
+            font-family: 'Dancing Script', cursive;
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .emoji-card {
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .emoji-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .emoji-card.selected {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: inline-block;
+            margin: 0 6px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: linear-gradient(135deg, #5D5CDE, #667eea);
+            transform: scale(1.2);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        .correct-animation {
+            animation: pulse 0.6s ease-in-out;
+        }
+        
+        .card-style-classic {
+            background: linear-gradient(135deg, #f4f1e8 0%, #e8dcc0 100%);
+            border: 2px solid #8B4513;
+        }
+        
+        .card-style-ink {
+            background: linear-gradient(135deg, #f8f8f8 0%, #e0e0e0 100%);
+            border: 2px solid #333;
+        }
+        
+        .card-style-elegant {
+            background: linear-gradient(135deg, #fff 0%, #f0f8ff 100%);
+            border: 2px solid #4682b4;
+        }
+        
+        .card-style-sunset {
+            background: linear-gradient(135deg, #ffe4e1 0%, #ffd4c4 100%);
+            border: 2px solid #cd853f;
+        }
+        
+        .card-style-bamboo {
+            background: linear-gradient(135deg, #f0fff0 0%, #e6ffe6 100%);
+            border: 2px solid #228b22;
+        }
+        
+        .card-style-dark {
+            background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+            border: 2px solid #8b7355;
+            color: #f0f0f0;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-md">
+        <!-- 头部 -->
+        <div class="flex justify-center items-center mb-4">
+            <span class="game-title">意</span>
+            <span class="emoji-title">emoji</span>
+            <span class="text-gray-600 ml-2">七下诗词意象配对</span>
+        </div>
+
+        <!-- 进度指示器和倒计时 -->
+        <div class="flex justify-between items-center mb-3">
+            <div class="progress-container flex space-x-2">
+                <div id="progress-text" class="text-sm text-primary mr-2">剩余机会：3</div>
+                <div id="progress-dots" class="flex">
+                    <!-- 进度点由JS动态生成 -->
+                </div>
+            </div>
+            <div id="current-score" class="text-sm font-medium text-primary">得分：0</div>
+        </div>
+        
+        <!-- 倒计时 -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-sm font-medium text-gray-700">时间剩余：<span id="countdown-text">20</span>秒</span>
+                <span id="countdown-warning" class="text-xs text-red-500 hidden">时间即将结束！</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+                <div id="countdown-bar" class="bg-gradient-to-r from-primary to-purple-400 h-3 rounded-full transition-all duration-1000" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <!-- 诗歌展示 -->
+        <div class="bg-white rounded-xl p-6 mb-6 border-2 border-primary relative shadow-lg">
+            <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary -mt-1 -ml-1 rounded-tl-lg"></div>
+            <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary -mb-1 -mr-1 rounded-br-lg"></div>
+            <p id="poem-text" class="text-lg text-center mb-3 leading-relaxed text-gray-800"></p>
+            <p id="poem-source" class="text-sm text-gray-600 text-center font-medium"></p>
+        </div>
+
+        <!-- Emoji选择网格 -->
+        <div id="emoji-grid" class="grid grid-cols-3 gap-4 mb-6">
+            <!-- Emoji卡片由JS动态生成 -->
+        </div>
+
+        <!-- 按钮区域 -->
+        <div class="flex space-x-4 mb-6">
+            <button id="generate-card" class="flex-1 bg-gradient-to-r from-primary to-purple-400 text-white py-3 px-4 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform transition-all duration-200 hover:scale-105">
+                🎨 制作壁纸
+            </button>
+            <button id="next-poem" class="flex-1 bg-gradient-to-r from-green-400 to-blue-400 text-white py-3 px-4 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform transition-all duration-200 hover:scale-105">
+                下一首 →
+            </button>
+        </div>
+
+        <!-- 解释区域 -->
+        <div id="explanation" class="bg-gradient-to-r from-indigo-100 to-purple-100 border-l-4 border-primary p-4 rounded-lg mb-6 hidden shadow-md">
+            <p id="explanation-text" class="text-sm text-gray-700 leading-relaxed"></p>
+        </div>
+
+        <!-- 游戏统计 -->
+        <div class="flex justify-between text-sm text-gray-600 border-t border-gray-200 pt-4">
+            <div>
+                <span class="font-medium">最高连击</span>
+                <span id="max-combo" class="ml-2 text-primary font-bold">0</span>
+            </div>
+            <div>
+                <span class="font-medium">平均时间</span>
+                <span id="avg-time" class="ml-2 text-primary font-bold">0s</span>
+            </div>
+            <div>
+                <span class="font-medium">详情</span>
+                <span class="ml-2">ℹ️</span>
+            </div>
+        </div>
+
+        <!-- 壁纸制作模态框 -->
+        <div id="card-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-screen overflow-y-auto">
+                <!-- 标题 -->
+                <div class="p-4 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-center flex items-center justify-center">
+                        <span class="game-title mr-2">意</span>
+                        <span class="emoji-title mr-2">emoji</span>
+                        <span class="text-gray-600">壁纸制作</span>
+                    </h2>
+                </div>
+                
+                <!-- 风格选择 -->
+                <div class="p-4">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">选择风格</h3>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <button class="style-btn card-style-classic p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="classic">
+                            <div class="text-lg mb-1">📜</div>
+                            典雅古风
+                        </button>
+                        <button class="style-btn card-style-ink p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="ink">
+                            <div class="text-lg mb-1">🖋️</div>
+                            水墨风韵
+                        </button>
+                        <button class="style-btn card-style-elegant p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="elegant">
+                            <div class="text-lg mb-1">☁️</div>
+                            清雅绝尘
+                        </button>
+                        <button class="style-btn card-style-sunset p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="sunset">
+                            <div class="text-lg mb-1">🌅</div>
+                            落霞飞雁
+                        </button>
+                        <button class="style-btn card-style-bamboo p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="bamboo">
+                            <div class="text-lg mb-1">🎋</div>
+                            青竹如茵
+                        </button>
+                        <button class="style-btn card-style-dark p-3 rounded-lg border-2 text-center text-sm font-medium transition-all" data-style="dark">
+                            <div class="text-lg mb-1">🌃</div>
+                            墨韵流芳
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 预览区 -->
+                <div class="p-4">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">预览效果 (9:16)</h3>
+                    <div id="wallpaper-preview" class="mx-auto bg-white rounded-lg shadow-lg overflow-hidden" style="width: 180px; height: 320px; transform: scale(0.8); transform-origin: top;">
+                        <div id="wallpaper-content" class="card-style-classic w-full h-full relative p-4 flex flex-col justify-between" style="width: 180px; height: 320px;">
+                            <!-- 装饰边框 -->
+                            <div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2" style="border-color: inherit;"></div>
+                            <div class="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2" style="border-color: inherit;"></div>
+                            <div class="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2" style="border-color: inherit;"></div>
+                            <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2" style="border-color: inherit;"></div>
+                            
+                            <!-- 诗歌内容区域 -->
+                            <div class="flex-1 flex justify-center items-center">
+                                <!-- 两列诗句布局 -->
+                                <div id="preview-poem" class="flex justify-center space-x-4 text-sm leading-relaxed font-chinese h-full items-center"></div>
+                            </div>
+                            
+                            <!-- 底部信息 -->
+                            <div class="absolute bottom-4 left-4">
+                                <!-- 作者信息（竖排在左下角） -->
+                                <div id="preview-source" class="text-xs text-gray-600 font-chinese"></div>
+                            </div>
+                            
+                            <!-- 品牌标识（右下角） -->
+                            <div class="absolute bottom-4 right-4">
+                                <div class="bg-red-800 text-white px-2 py-1 text-xs rounded">
+                                    <span class="game-title text-xs">意</span><span class="emoji-title text-xs">emoji</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 隐藏的emoji区域 -->
+                            <div id="preview-emojis" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="p-4 border-t border-gray-200">
+                    <div class="flex space-x-3">
+                        <button id="close-modal" class="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-xl font-medium hover:bg-gray-200 transition-colors">
+                            取消
+                        </button>
+                        <button id="download-wallpaper" class="flex-1 bg-gradient-to-r from-primary to-purple-400 text-white py-3 px-4 rounded-xl font-medium hover:from-purple-500 hover:to-primary transition-all">
+                            📱 下载壁纸
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // 游戏数据
+        const poems = [
+            {
+                text: "谁家玉笛暗飞声，散入春风满洛城。\n此夜曲中闻折柳，何人不起故园情。",
+                source: "春夜洛城闻笛·李白",
+                correctEmojis: [
+                    { emoji: "🎵", meaning: "玉笛/笛声" },
+                    { emoji: "🍃", meaning: "春风" },
+                    { emoji: "🏙️", meaning: "洛城/城市" },
+                    { emoji: "🏡", meaning: "故园/思乡" }
+                ],
+                explanation: "这首诗描绘了春夜里笛声在洛阳城中飘荡的场景，引发了诗人的思乡之情。意象包括玉笛(🎵)、春风(🍃)、洛城(🏙️)和思乡之情(🏡)。"
+            },
+            {
+                text: "草树知春不久归，百般红紫斗芳菲。\n杨花榆荚无才思，惟解漫天作雪飞。",
+                source: "晚春·韩愈",
+                correctEmojis: [
+                    { emoji: "🌿", meaning: "草树/植物" },
+                    { emoji: "🌸", meaning: "花朵/芳菲" },
+                    { emoji: "🌱", meaning: "杨花/榆荚" },
+                    { emoji: "❄️", meaning: "飘雪/漫天飞舞" }
+                ],
+                explanation: "这首诗描绘了晚春时节的景象，各种花卉争奇斗艳，而杨花和榆荚虽无才情却漫天飞舞如雪。意象包括草树(🌿)、花朵(🌸)、杨花榆荚(🌱)和飘雪(❄️)。"
+            },
+            {
+                text: "黄梅时节家家雨，青草池塘处处蛙。\n有约不来过夜半，闲敲棋子落灯花。",
+                source: "约客·赵师秀",
+                correctEmojis: [
+                    { emoji: "🌧️", meaning: "梅雨/雨水" },
+                    { emoji: "🐸", meaning: "青蛙/蛙声" },
+                    { emoji: "♟️", meaning: "棋子" },
+                    { emoji: "🕯️", meaning: "灯花/灯烛" }
+                ],
+                explanation: "这首诗描写了梅雨季节等待友人不至的情景。意象包括梅雨(🌧️)、青蛙(🐸)、棋子(♟️)和灯花(🕯️)，表达了诗人的孤独和期待。"
+            },
+            {
+                text: "故园东望路漫漫，双袖龙钟泪不干。\n马上相逢无纸笔，凭君传语报平安。",
+                source: "逢入京使·岑参",
+                correctEmojis: [
+                    { emoji: "🏡", meaning: "故乡/故园" },
+                    { emoji: "😢", meaning: "泪水/思念" },
+                    { emoji: "🐎", meaning: "马匹/旅途" },
+                    { emoji: "💌", meaning: "信息/传语" }
+                ],
+                explanation: "这首诗描述了诗人在异乡遇到进京使者的情景，表达了对家乡的思念之情。意象包括故园(🏡)、泪水(😢)、马匹(🐎)和传信(💌)。"
+            },
+            {
+                text: "浩荡离愁白日斜，吟鞭东指即天涯。\n落红不是无情物，化作春泥更护花。",
+                source: "己亥杂诗·龚自珍",
+                correctEmojis: [
+                    { emoji: "🌇", meaning: "夕阳/白日斜" },
+                    { emoji: "🧳", meaning: "远行/天涯" },
+                    { emoji: "🥀", meaning: "落花/落红" },
+                    { emoji: "🌱", meaning: "春泥/土壤" }
+                ],
+                explanation: "这首诗表达了诗人离愁和对未来的展望。最后两句落红不是无情物，化作春泥更护花尤为著名。意象包括夕阳(🌇)、远行(🧳)、落花(🥀)和春泥(🌱)。"
+            },
+            {
+                text: "莫笑农家腊酒浑，丰年留客足鸡豚。\n山重水复疑无路，柳暗花明又一村。",
+                source: "游山西村·陆游",
+                correctEmojis: [
+                    { emoji: "🏘️", meaning: "农家/村庄" },
+                    { emoji: "🏞️", meaning: "山水/山路" },
+                    { emoji: "🌳", meaning: "柳树" },
+                    { emoji: "🌸", meaning: "花朵/明亮" }
+                ],
+                explanation: "这首诗描绘了诗人游览山村的情景，其中山重水复疑无路，柳暗花明又一村成为了千古名句。意象包括农家(🏘️)、山水(🏞️)、柳树(🌳)和花朵(🌸)。"
+            },
+            {
+                text: "绿槐高柳咽新蝉。薰风初入弦。\n碧纱窗下水沈烟。棋声惊昼眠。",
+                source: "阮郎归 初夏·苏轼",
+                correctEmojis: [
+                    { emoji: "🦗", meaning: "蝉/蝉鸣" },
+                    { emoji: "🍃", meaning: "微风/薰风" },
+                    { emoji: "♟️", meaning: "下棋/棋声" },
+                    { emoji: "😴", meaning: "昼眠/午睡" }
+                ],
+                explanation: "这首词描绘了初夏时节的景象，包括蝉鸣(🦗)、薰风(🍃)、棋声(♟️)和昼眠(😴)，营造出一种悠闲恬静的初夏氛围。"
+            },
+            {
+                text: "梅子金黄杏子肥，麦花雪白菜花稀。\n日长篱落无人过，惟有蜻蜓蛱蝶飞。",
+                source: "夏日田园杂兴十二绝（其一）·范成大",
+                correctEmojis: [
+                    { emoji: "🍑", meaning: "果实/梅杏" },
+                    { emoji: "🌾", meaning: "麦花/菜花" },
+                    { emoji: "🌄", meaning: "篱笆/田园" },
+                    { emoji: "🦋", meaning: "蜻蜓/蝴蝶" }
+                ],
+                explanation: "这首诗描绘了夏日田园的静谧景象，成熟的果实、盛开的花朵和飞舞的昆虫构成了一幅生动的乡村图景。意象包括果实(🍑)、麦花(🌾)、田园(🌄)和蜻蜓蝴蝶(🦋)。"
+            },
+            {
+                text: "独坐幽篁里，弹琴复长啸。\n深林人不知，明月来相照。",
+                source: "竹里馆·王维",
+                correctEmojis: [
+                    { emoji: "🎋", meaning: "竹林/幽篁" },
+                    { emoji: "🎻", meaning: "琴/音乐" },
+                    { emoji: "🌲", meaning: "深林/独处" },
+                    { emoji: "🌕", meaning: "明月" }
+                ],
+                explanation: "这首诗描述了诗人独自在竹林中弹琴长啸，与自然融为一体的意境。意象包括竹林(🎋)、琴声(🎻)、深林(🌲)和明月(🌕)，表达了诗人隐逸的心境。"
+            },
+            {
+                text: "烟笼寒水月笼沙，夜泊秦淮近酒家。\n商女不知亡国恨，隔江犹唱后庭花。",
+                source: "泊秦淮·杜牧",
+                correctEmojis: [
+                    { emoji: "🌫️", meaning: "水雾/烟笼" },
+                    { emoji: "🌙", meaning: "月光/月色" },
+                    { emoji: "🚣", meaning: "船只/夜泊" },
+                    { emoji: "🎵", meaning: "歌声/唱曲" }
+                ],
+                explanation: "这首诗描绘了诗人夜泊秦淮河畔的所见所感，表达了对国家命运的忧思。意象包括水雾(🌫️)、月光(🌙)、船只(🚣)和歌声(🎵)。"
+            },
+            {
+                text: "飞来山上千寻塔，闻说鸡鸣见日升。\n不畏浮云遮望眼，自缘身在最高层。",
+                source: "登飞来峰·王安石",
+                correctEmojis: [
+                    { emoji: "🏔️", meaning: "高山/峰顶" },
+                    { emoji: "🗼", meaning: "塔楼/千寻塔" },
+                    { emoji: "🌅", meaning: "日出/日升" },
+                    { emoji: "☁️", meaning: "浮云" }
+                ],
+                explanation: "这首诗描述了诗人登上飞来峰俯瞰大地的情景，表达了一种高瞻远瞩的胸怀。意象包括高山(🏔️)、塔楼(🗼)、日出(🌅)和浮云(☁️)。"
+            },
+            {
+                text: "宣室求贤访逐臣，贾生才调更无伦。\n可怜夜半虚前席，不问苍生问鬼神。",
+                source: "贾生·李商隐",
+                correctEmojis: [
+                    { emoji: "🏛️", meaning: "宫殿/宣室" },
+                    { emoji: "🌃", meaning: "夜晚/夜半" },
+                    { emoji: "👻", meaning: "鬼神/迷信" }
+                ],
+                explanation: "这首诗通过贾谊的故事，批评了统治者不重视贤才、迷信鬼神的行为。意象包括宫殿(🏛️)、夜晚(🌃)和鬼神(👻)。"
+            },
+            {
+                text: "莫言下岭便无难，赚得行人错喜欢。\n政入万山围子里，一山放出一山拦。",
+                source: "过松源晨炊漆公店（其五）·杨万里",
+                correctEmojis: [
+                    { emoji: "⛰️", meaning: "山岭/下岭" },
+                    { emoji: "🚶", meaning: "旅人/行人" },
+                    { emoji: "🏞️", meaning: "山路/山围" },
+                    { emoji: "🚧", meaning: "障碍/拦阻" }
+                ],
+                explanation: "这首诗描述了翻山越岭的艰难历程，一座山过去后又是一座山，寓意人生道路的曲折。意象包括山岭(⛰️)、旅人(🚶)、山路(🏞️)和障碍(🚧)。"
+            },
+            {
+                text: "前不见古人，后不见来者。\n念天地之悠悠，独怆然而涕下！",
+                source: "登幽州台歌·陈子昂",
+                correctEmojis: [
+                    { emoji: "⏳", meaning: "古今/时间" },
+                    { emoji: "🌏", meaning: "广阔/天地" },
+                    { emoji: "🧍", meaning: "孤独/独立" },
+                    { emoji: "😢", meaning: "悲伤/泪下" }
+                ],
+                explanation: "这首诗表达了诗人面对浩瀚时空的孤独感和对人生短暂的悲叹。意象包括时间流逝(⏳)、天地广阔(🌏)、孤独感(🧍)和悲伤情绪(😢)。"
+            }
+        ];
+
+        // 干扰emoji库
+        const distractorEmojis = [
+            "😀", "😎", "🌈", "🐍", "🦊", "🌹", "🍁", "🌻", "🐢", "🐟", 
+            "🦁", "🐯", "🦆", "☔", "⚡", "❤️", "🔥", "🎭", "🎬", "📚", 
+            "⏰", "🎁", "🏆", "🎮", "🚗", "🚂", "✈️", "🚀", "🎪", "🏝️"
+        ];
+
+        // 游戏状态
+        let gameState = {
+            currentPoemIndex: 0,
+            selectedEmojis: [],
+            score: 0,
+            maxCombo: 0,
+            currentCombo: 0,
+            startTime: null,
+            totalTime: 0,
+            completedPoems: 0,
+            lives: 3,
+            countdownTime: 20,
+            countdownInterval: null,
+            isPoemCompleted: false
+        };
+
+        // DOM元素
+        const poemTextElement = document.getElementById('poem-text');
+        const poemSourceElement = document.getElementById('poem-source');
+        const emojiGridElement = document.getElementById('emoji-grid');
+        const explanationElement = document.getElementById('explanation');
+        const explanationTextElement = document.getElementById('explanation-text');
+        const generateCardButton = document.getElementById('generate-card');
+        const nextPoemButton = document.getElementById('next-poem');
+        const currentScoreElement = document.getElementById('current-score');
+        const progressTextElement = document.getElementById('progress-text');
+        const progressDotsElement = document.getElementById('progress-dots');
+        const maxComboElement = document.getElementById('max-combo');
+        const avgTimeElement = document.getElementById('avg-time');
+        const cardModal = document.getElementById('card-modal');
+        const cardPoemElement = document.getElementById('card-poem');
+        const cardSourceElement = document.getElementById('card-source');
+        const cardEmojisElement = document.getElementById('card-emojis');
+        const cardExplanationElement = document.getElementById('card-explanation');
+        const closeModalButton = document.getElementById('close-modal');
+        const saveCardButton = document.getElementById('save-card');
+
+        // 初始化游戏
+        function initializeGame() {
+            // 随机打乱诗歌顺序
+            shuffleArray(poems);
+            
+            // 创建进度点
+            createProgressDots();
+            
+            // 加载第一首诗
+            loadPoem(0);
+            
+            // 禁用"生成卡片"按钮，直到完成当前诗的匹配
+            generateCardButton.disabled = true;
+            
+            // 添加按钮事件监听器
+            generateCardButton.addEventListener('click', showCardModal);
+            nextPoemButton.addEventListener('click', loadNextPoem);
+            closeModalButton.addEventListener('click', hideCardModal);
+            document.getElementById('download-wallpaper').addEventListener('click', downloadWallpaper);
+            
+            // 记录开始时间
+            gameState.startTime = new Date();
+        }
+
+        // 创建进度点
+        function createProgressDots() {
+            progressDotsElement.innerHTML = '';
+            for (let i = 0; i < Math.min(poems.length, 5); i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (i === 0) dot.classList.add('active');
+                progressDotsElement.appendChild(dot);
+            }
+        }
+
+        // 更新进度点
+        function updateProgressDots() {
+            const dots = progressDotsElement.querySelectorAll('.progress-dot');
+            const visibleDots = Math.min(poems.length, 5);
+            const currentPosition = gameState.currentPoemIndex % visibleDots;
+            
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active');
+                if (index === currentPosition) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        // 倒计时相关元素
+        const countdownTextElement = document.getElementById('countdown-text');
+        const countdownBarElement = document.getElementById('countdown-bar');
+        const countdownWarningElement = document.getElementById('countdown-warning');
+        
+        // 加载诗歌
+        function loadPoem(index) {
+            const poem = poems[index];
+            
+            // 更新诗歌文本和来源
+            poemTextElement.innerHTML = poem.text.replace(/\n/g, '<br>');
+            poemSourceElement.textContent = poem.source;
+            
+            // 重置选中的emoji
+            gameState.selectedEmojis = [];
+            
+            // 生成emoji网格
+            generateEmojiGrid(poem);
+            
+            // 隐藏解释
+            explanationElement.classList.add('hidden');
+            
+            // 禁用"生成卡片"按钮
+            generateCardButton.disabled = true;
+            
+            // 如果是最后一首诗，禁用"下一首"按钮
+            nextPoemButton.disabled = index >= poems.length - 1;
+            
+            // 更新进度
+            updateProgressDots();
+            
+            // 重置并启动倒计时
+            resetCountdown();
+            startCountdown();
+            
+            // 重置诗歌完成状态
+            gameState.isPoemCompleted = false;
+        }
+        
+        // 启动倒计时
+        function startCountdown() {
+            // 清除之前的计时器（如果有）
+            if (gameState.countdownInterval) {
+                clearInterval(gameState.countdownInterval);
+            }
+            
+            // 重置计时器状态
+            gameState.countdownTime = 20;
+            updateCountdownDisplay();
+            
+            // 设置新的计时器
+            gameState.countdownInterval = setInterval(() => {
+                gameState.countdownTime--;
+                updateCountdownDisplay();
+                
+                // 当时间剩余5秒时显示警告
+                if (gameState.countdownTime <= 5) {
+                    countdownWarningElement.classList.remove('hidden');
+                    countdownBarElement.classList.add('bg-red-500');
+                    countdownBarElement.classList.remove('bg-primary');
+                }
+                
+                // 时间用完
+                if (gameState.countdownTime <= 0) {
+                    clearInterval(gameState.countdownInterval);
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+        
+        // 更新倒计时显示
+        function updateCountdownDisplay() {
+            // 更新文字显示
+            countdownTextElement.textContent = gameState.countdownTime;
+            
+            // 更新进度条
+            const percentage = (gameState.countdownTime / 20) * 100;
+            countdownBarElement.style.width = `${percentage}%`;
+        }
+        
+        // 重置倒计时显示
+        function resetCountdown() {
+            gameState.countdownTime = 20;
+            countdownTextElement.textContent = "20";
+            countdownBarElement.style.width = "100%";
+            countdownWarningElement.classList.add('hidden');
+            countdownBarElement.classList.remove('bg-red-500');
+            countdownBarElement.classList.add('bg-primary');
+        }
+        
+        // 处理时间用完
+        function handleTimeUp() {
+            // 如果诗歌已经完成了，不做任何处理
+            if (gameState.isPoemCompleted) return;
+            
+            // 根据已匹配的正确emoji数量给予部分分数
+            const poem = poems[gameState.currentPoemIndex];
+            const correctEmojis = poem.correctEmojis.map(item => item.emoji);
+            const correctMatches = gameState.selectedEmojis.filter(emoji => correctEmojis.includes(emoji)).length;
+            
+            // 每个正确匹配得5分（而不是完成全部匹配时的10分/个）
+            const partialScore = correctMatches * 5;
+            gameState.score += partialScore;
+            
+            // 重置连击
+            gameState.currentCombo = 0;
+            
+            // 显示解释和正确答案
+            explanationElement.classList.remove('hidden');
+            explanationTextElement.textContent = `时间到！你匹配了${correctMatches}个正确意象。` + poem.explanation;
+            
+            // 在网格中标记所有正确答案
+            const emojiCards = emojiGridElement.querySelectorAll('.emoji-card');
+            emojiCards.forEach(card => {
+                const emoji = card.dataset.emoji;
+                if (correctEmojis.includes(emoji) && !gameState.selectedEmojis.includes(emoji)) {
+                    // 高亮显示未选中的正确答案
+                    card.classList.add('bg-yellow-200');
+                    card.classList.add('border-2');
+                    card.classList.add('border-primary');
+                }
+            });
+            
+            // 启用"生成卡片"和"下一首"按钮
+            generateCardButton.disabled = false;
+            
+            // 标记当前诗歌已完成
+            gameState.isPoemCompleted = true;
+            
+            // 更新UI
+            updateUI();
+        }
+        
+        // 停止倒计时
+        function stopCountdown() {
+            if (gameState.countdownInterval) {
+                clearInterval(gameState.countdownInterval);
+                gameState.countdownInterval = null;
+            }
+        }
+
+        // 生成emoji网格
+        function generateEmojiGrid(poem) {
+            emojiGridElement.innerHTML = '';
+            
+            // 获取正确的emoji
+            const correctEmojis = poem.correctEmojis.map(item => item.emoji);
+            
+            // 创建包含正确emoji和干扰emoji的数组
+            const allEmojis = [...correctEmojis];
+            
+            // 添加干扰emoji，直到总数达到12个
+            while (allEmojis.length < 12) {
+                const randomIndex = Math.floor(Math.random() * distractorEmojis.length);
+                const distractor = distractorEmojis[randomIndex];
+                if (!allEmojis.includes(distractor)) {
+                    allEmojis.push(distractor);
+                }
+            }
+            
+            // 打乱emoji顺序
+            shuffleArray(allEmojis);
+            
+            // 创建emoji卡片
+            allEmojis.forEach(emoji => {
+                const card = document.createElement('div');
+                card.className = 'emoji-card bg-white shadow-md rounded-lg flex items-center justify-center p-4 cursor-pointer text-4xl';
+                card.textContent = emoji;
+                card.dataset.emoji = emoji;
+                
+                // 添加点击事件
+                card.addEventListener('click', () => handleEmojiClick(card, emoji, poem));
+                
+                emojiGridElement.appendChild(card);
+            });
+        }
+
+        // 处理emoji点击
+        function handleEmojiClick(card, emoji, poem) {
+            // 检查是否已经选中
+            if (card.classList.contains('selected')) {
+                // 取消选中
+                card.classList.remove('selected');
+                gameState.selectedEmojis = gameState.selectedEmojis.filter(e => e !== emoji);
+            } else {
+                // 选中
+                const correctEmojis = poem.correctEmojis.map(item => item.emoji);
+                
+                if (correctEmojis.includes(emoji)) {
+                    // 正确答案
+                    card.classList.add('selected');
+                    gameState.selectedEmojis.push(emoji);
+                    
+                    // 添加动画
+                    card.classList.add('correct-animation');
+                    setTimeout(() => {
+                        card.classList.remove('correct-animation');
+                    }, 500);
+                    
+                    // 更新分数和连击
+                    gameState.score += 10;
+                    gameState.currentCombo++;
+                    if (gameState.currentCombo > gameState.maxCombo) {
+                        gameState.maxCombo = gameState.currentCombo;
+                    }
+                    
+                    // 检查是否完成当前诗的所有正确匹配
+                    if (correctEmojis.every(e => gameState.selectedEmojis.includes(e))) {
+                        // 停止倒计时
+                        stopCountdown();
+                        
+                        // 显示解释
+                        explanationElement.classList.remove('hidden');
+                        explanationTextElement.textContent = poem.explanation;
+                        
+                        // 启用"生成卡片"按钮
+                        generateCardButton.disabled = false;
+                        
+                        // 标记当前诗歌已完成
+                        gameState.isPoemCompleted = true;
+                        
+                        // 计算额外的时间奖励（剩余时间 × 2）
+                        const timeBonus = gameState.countdownTime * 2;
+                        gameState.score += timeBonus;
+                        
+                        // 更新解释文本，包含时间奖励信息
+                        explanationTextElement.textContent = `太棒了！你成功匹配了所有意象，获得时间奖励 ${timeBonus} 分！\n` + poem.explanation;
+                    }
+                } else {
+                    // 错误答案
+                    gameState.currentCombo = 0;
+                    gameState.lives--;
+                    
+                    // 卡片短暂闪烁
+                    card.classList.add('bg-red-200');
+                    setTimeout(() => {
+                        card.classList.remove('bg-red-200');
+                    }, 300);
+                    
+                    // 如果没有生命值，游戏结束
+                    if (gameState.lives <= 0) {
+                        endGame();
+                    }
+                }
+                
+                // 更新UI
+                updateUI();
+            }
+        }
+
+        // 更新UI
+        function updateUI() {
+            currentScoreElement.textContent = `得分：${gameState.score}`;
+            progressTextElement.textContent = `剩余机会：${gameState.lives}`;
+            maxComboElement.textContent = gameState.maxCombo;
+            
+            if (gameState.completedPoems > 0) {
+                const avgTimeInSeconds = Math.round(gameState.totalTime / gameState.completedPoems);
+                avgTimeElement.textContent = `${avgTimeInSeconds}s`;
+            }
+        }
+
+        // 加载下一首诗
+        function loadNextPoem() {
+            // 停止当前倒计时
+            stopCountdown();
+            
+            // 记录完成时间
+            const now = new Date();
+            const timeTaken = (now - gameState.startTime) / 1000; // 秒
+            gameState.totalTime += timeTaken;
+            gameState.completedPoems++;
+            
+            // 重置开始时间
+            gameState.startTime = now;
+            
+            // 前进到下一首诗
+            gameState.currentPoemIndex++;
+            
+            if (gameState.currentPoemIndex < poems.length) {
+                loadPoem(gameState.currentPoemIndex);
+            } else {
+                // 游戏结束
+                endGame();
+            }
+        }
+
+        // 结束游戏
+        function endGame() {
+            if (gameState.lives <= 0) {
+                alert(`游戏结束！\n\n你的最终得分是：${gameState.score}\n最高连击：${gameState.maxCombo}`);
+            } else {
+                alert(`恭喜！你完成了所有诗歌的配对！\n\n最终得分：${gameState.score}\n最高连击：${gameState.maxCombo}`);
+            }
+            
+            // 重新开始游戏
+            resetGame();
+        }
+
+        // 重置游戏
+        function resetGame() {
+            // 停止任何正在运行的倒计时
+            stopCountdown();
+            
+            gameState = {
+                currentPoemIndex: 0,
+                selectedEmojis: [],
+                score: 0,
+                maxCombo: 0,
+                currentCombo: 0,
+                startTime: new Date(),
+                totalTime: 0,
+                completedPoems: 0,
+                lives: 3,
+                countdownTime: 20,
+                countdownInterval: null,
+                isPoemCompleted: false
+            };
+            
+            shuffleArray(poems);
+            createProgressDots();
+            loadPoem(0);
+            updateUI();
+        }
+
+        // 壁纸制作相关变量
+        let currentWallpaperStyle = 'classic';
+        
+        // 显示壁纸制作模态框
+        function showCardModal() {
+            const poem = poems[gameState.currentPoemIndex];
+            
+            // 更新预览内容
+            updateWallpaperPreview(poem);
+            
+            // 显示模态框
+            cardModal.classList.remove('hidden');
+            
+            // 初始化风格选择器
+            initializeStyleSelector();
+        }
+
+        // 初始化风格选择器
+        function initializeStyleSelector() {
+            const styleButtons = document.querySelectorAll('.style-btn');
+            
+            styleButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 移除所有active样式
+                    styleButtons.forEach(btn => btn.classList.remove('ring-2', 'ring-primary'));
+                    
+                    // 添加active样式到当前按钮
+                    button.classList.add('ring-2', 'ring-primary');
+                    
+                    // 更新当前风格
+                    currentWallpaperStyle = button.dataset.style;
+                    
+                    // 更新预览
+                    const poem = poems[gameState.currentPoemIndex];
+                    updateWallpaperPreview(poem);
+                });
+            });
+            
+            // 默认选择第一个风格
+            if (styleButtons.length > 0) {
+                styleButtons[0].classList.add('ring-2', 'ring-primary');
+            }
+        }
+
+        // 更新壁纸预览
+        function updateWallpaperPreview(poem) {
+            const wallpaperContent = document.getElementById('wallpaper-content');
+            const previewPoem = document.getElementById('preview-poem');
+            const previewSource = document.getElementById('preview-source');
+            const previewEmojis = document.getElementById('preview-emojis');
+            
+            // 更新风格类 - 9:16比例的布局
+            wallpaperContent.className = `card-style-${currentWallpaperStyle} w-full h-full relative p-4 flex flex-col justify-center`;
+            
+            // 格式化诗歌文本 - 古籍方式由右至左竖排版，每句诗一列
+            const poemLines = poem.text.split('\n');
+            
+            previewPoem.innerHTML = `
+                <div class="flex justify-center items-center h-full">
+                    <!-- 古籍式排版：从右到左 -->
+                    <div class="flex items-center space-x-2" style="flex-direction: row-reverse;">
+                        ${poemLines.map(line => `
+                            <div class="flex flex-col text-center" style="writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 0.05em; font-family: 'STXingkai', 'STKaiti', 'KaiTi', 'SimKai', serif;">
+                                ${line.split('').map(char => `<span class="block text-xs leading-tight">${char}</span>`).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // 设置作者信息为竖排（将放在左下角）
+            const [title, author] = poem.source.split('·');
+            previewSource.innerHTML = `
+                <div class="flex space-x-1" style="flex-direction: row-reverse;">
+                    <div class="flex flex-col text-center" style="writing-mode: vertical-rl; text-orientation: upright; font-family: 'STXingkai', 'STKaiti', 'KaiTi', 'SimKai', serif;">
+                        ${author ? author.split('').map(char => `<span class="block text-xs">${char}</span>`).join('') : ''}
+                    </div>
+                    <div class="flex flex-col text-center" style="writing-mode: vertical-rl; text-orientation: upright; font-family: 'STXingkai', 'STKaiti', 'KaiTi', 'SimKai', serif;">
+                        ${title.split('').map(char => `<span class="block text-xs">${char}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // 隐藏emoji意象（不在壁纸中显示）
+            previewEmojis.innerHTML = '';
+            previewEmojis.style.display = 'none';
+        }
+
+        // 隐藏壁纸模态框
+        function hideCardModal() {
+            cardModal.classList.add('hidden');
+        }
+
+        // 下载壁纸
+        async function downloadWallpaper() {
+            const poem = poems[gameState.currentPoemIndex];
+            
+            // 显示下载提示
+            const downloadBtn = document.getElementById('download-wallpaper');
+            const originalText = downloadBtn.textContent;
+            downloadBtn.textContent = '正在生成...';
+            downloadBtn.disabled = true;
+            
+            try {
+                // 创建高分辨率的壁纸容器 - 9:16比例（手机壁纸）
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 设置canvas尺寸 (1080x1920, 9:16比例)
+                canvas.width = 1080;
+                canvas.height = 1920;
+                
+                // 获取当前风格的颜色配置
+                const styleConfig = {
+                    'classic': { bg: ['#f4f1e8', '#e8dcc0'], color: '#8B4513', border: '#8B4513' },
+                    'ink': { bg: ['#f8f8f8', '#e0e0e0'], color: '#333', border: '#333' },
+                    'elegant': { bg: ['#fff', '#f0f8ff'], color: '#4682b4', border: '#4682b4' },
+                    'sunset': { bg: ['#ffe4e1', '#ffd4c4'], color: '#cd853f', border: '#cd853f' },
+                    'bamboo': { bg: ['#f0fff0', '#e6ffe6'], color: '#228b22', border: '#228b22' },
+                    'dark': { bg: ['#2c2c2c', '#1a1a1a'], color: '#f0f0f0', border: '#8b7355' }
+                };
+                
+                const config = styleConfig[currentWallpaperStyle];
+                
+                // 创建渐变背景
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, config.bg[0]);
+                gradient.addColorStop(1, config.bg[1]);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制装饰边框
+                ctx.strokeStyle = config.border;
+                ctx.lineWidth = 8;
+                const borderSize = 80;
+                const margin = 40;
+                
+                // 四个角的装饰边框
+                ctx.beginPath();
+                // 左上角
+                ctx.moveTo(margin, margin + borderSize);
+                ctx.lineTo(margin, margin);
+                ctx.lineTo(margin + borderSize, margin);
+                // 右上角
+                ctx.moveTo(canvas.width - margin - borderSize, margin);
+                ctx.lineTo(canvas.width - margin, margin);
+                ctx.lineTo(canvas.width - margin, margin + borderSize);
+                // 左下角
+                ctx.moveTo(margin, canvas.height - margin - borderSize);
+                ctx.lineTo(margin, canvas.height - margin);
+                ctx.lineTo(margin + borderSize, canvas.height - margin);
+                // 右下角
+                ctx.moveTo(canvas.width - margin - borderSize, canvas.height - margin);
+                ctx.lineTo(canvas.width - margin, canvas.height - margin);
+                ctx.lineTo(canvas.width - margin, canvas.height - margin - borderSize);
+                ctx.stroke();
+                
+                // 设置字体样式（行书风格）
+                ctx.fillStyle = config.color;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // 古籍式排版：每句诗一列，由右至左排列
+                const poemLines = poem.text.split('\n');
+                
+                // 字体大小和位置设置
+                const fontSize = 80;
+                const charSpacing = fontSize + 20;
+                const columnSpacing = 150; // 列间距
+                const startY = 200; // 调整到右上角位置
+                
+                // 计算总宽度并确定起始位置（右侧开始）
+                const totalWidth = (poemLines.length - 1) * columnSpacing;
+                const startX = canvas.width - 180; // 从右侧开始，与边框保持合适距离
+                
+                // 从右到左绘制每句诗（古籍阅读顺序）
+                poemLines.forEach((line, lineIndex) => {
+                    const chars = line.split('');
+                    const currentX = startX - lineIndex * columnSpacing;
+                    
+                    // 计算每列的起始Y位置（从上开始）
+                    const lineStartY = startY;
+                    
+                    chars.forEach((char, charIndex) => {
+                        ctx.font = `${fontSize}px "STXingkai", "STKaiti", "KaiTi", "SimKai", serif`;
+                        // 从上至下排列：Y坐标递增
+                        ctx.fillText(char, currentX, lineStartY + charIndex * charSpacing);
+                    });
+                });
+                
+                // 在左下角绘制诗名和作者信息（竖排）
+                const [title, author] = poem.source.split('·');
+                
+                // 动态计算布局位置，避免遮挡
+                const titleChars = title.split('');
+                const authorChars = author ? author.split('') : [];
+                
+                // 字符间距
+                const titleCharSpacing = 55;
+                const authorCharSpacing = 50;
+                
+                // 计算所需高度
+                const titleHeight = titleChars.length * titleCharSpacing;
+                const authorHeight = authorChars.length * authorCharSpacing;
+                const maxTextHeight = Math.max(titleHeight, authorHeight);
+                
+                // logo高度和间距
+                const logoHeight = 60;
+                const textToLogoGap = 40; // 文字到logo的间距
+                const logoBottomMargin = 80; // logo到底部的边距
+                
+                // 计算起始位置（从底部往上计算）
+                const logoY = canvas.height - logoBottomMargin;
+                const textBottomY = logoY - logoHeight/2 - textToLogoGap;
+                const textStartY = textBottomY - maxTextHeight;
+                
+                // 确保文字不会超出顶部边界
+                const minTextStartY = 200; // 最小起始位置
+                const finalTextStartY = Math.max(textStartY, minTextStartY);
+                
+                // 绘制作者（最左侧，从上到下）
+                if (author) {
+                    const authorX = 120;
+                    const authorStartY = finalTextStartY;
+                    
+                    ctx.font = '40px "STXingkai", "STKaiti", "KaiTi", "SimKai", serif';
+                    authorChars.forEach((char, charIndex) => {
+                        ctx.fillText(char, authorX, authorStartY + charIndex * authorCharSpacing);
+                    });
+                }
+                
+                // 绘制诗名（作者右侧，从上到下）
+                const titleX = 200;
+                const titleStartY = finalTextStartY;
+                
+                ctx.font = '45px "STXingkai", "STKaiti", "KaiTi", "SimKai", serif';
+                titleChars.forEach((char, charIndex) => {
+                    ctx.fillText(char, titleX, titleStartY + charIndex * titleCharSpacing);
+                });
+                
+                // 在左下角绘制品牌标识（印章效果）
+                const logoX = 160; // 位于作者和诗名中间偏右
+                
+                ctx.fillStyle = '#b91c1c';
+                ctx.fillRect(logoX - 60, logoY - 30, 120, 60);
+                ctx.fillStyle = 'white';
+                ctx.font = '24px "STKaiti", "KaiTi", "SimKai", serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('意emoji', logoX, logoY);
+                
+                // 转换为blob并下载
+                canvas.toBlob(blob => {
+                    if (blob) {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `意emoji-${poem.source.replace(/[·\s]/g, '-')}-9x16.jpg`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                        
+                        alert('壁纸下载成功！');
+                    } else {
+                        throw new Error('图片生成失败');
+                    }
+                }, 'image/jpeg', 0.9);
+                
+            } catch (error) {
+                console.error('生成壁纸失败:', error);
+                alert('生成壁纸失败，请重试\n错误信息：' + error.message);
+            } finally {
+                // 恢复按钮状态
+                downloadBtn.textContent = originalText;
+                downloadBtn.disabled = false;
+            }
+        }
+
+        // 辅助函数：打乱数组
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // 初始化游戏
+        initializeGame();
+    </script>
+
+
+</body></html>

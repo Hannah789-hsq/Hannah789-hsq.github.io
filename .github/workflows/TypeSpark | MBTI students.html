@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>TypeSpark | 16型学生版（20题）</title>
+<meta name="description" content="TypeSpark 学生版：20题轻量测评，结果含类型、字母解释（大字母+英文+中文）、维度强度、代表人物（含口头禅）与学习建议；活泼动画风格；支持背景音乐。由 Hannah 制作。" />
+<style>
+  :root{
+    --c-blue:#4DA3FF;
+    --c-purple:#8B77FF;
+    --c-orange:#FFB84D;
+    --c-green:#66E3A4;
+    --c-pink:#FF6B9A;
+    --c-bg1:#f6f8ff;
+    --c-bg2:#fefaf5;
+    --c-text:#2f2f33;
+    --c-muted:#6b6f76;
+    --c-card:#ffffff;
+    --radius:16px;
+    --shadow:0 6px 20px rgba(0,0,0,0.08);
+    --shadow-soft:0 3px 12px rgba(0,0,0,0.06);
+    --bar-h:12px;
+    --trans:220ms cubic-bezier(.2,.8,.2,1);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --c-bg1:#0f1220; --c-bg2:#191d2d; --c-text:#f2f4fa; --c-muted:#a7abc0; --c-card:#141826;
+      --shadow:0 6px 20px rgba(0,0,0,.35); --shadow-soft:0 3px 12px rgba(0,0,0,.28);
+    }
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+    color:var(--c-text);
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(77,163,255,.20), transparent 60%),
+      radial-gradient(900px 600px at 120% 10%, rgba(139,119,255,.18), transparent 55%),
+      radial-gradient(700px 500px at 50% 120%, rgba(255,184,77,.18), transparent 50%),
+      linear-gradient(180deg,var(--c-bg1),var(--c-bg2));
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:16px 14px 80px}
+  header{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:saturate(1.2) blur(8px);
+    background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.5));
+    border-bottom:1px solid rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    header{ background:linear-gradient(180deg,rgba(20,24,38,.6),rgba(20,24,38,.35)); border-color:rgba(255,255,255,.08);}
+  }
+  .h-inner{max-width:980px; margin:0 auto; padding:10px 14px; display:flex; gap:10px; align-items:center; justify-content:space-between}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .logo{
+    width:36px; height:36px; border-radius:10px;
+    background: conic-gradient(from 220deg, var(--c-blue), var(--c-purple), var(--c-orange), var(--c-green), var(--c-blue));
+    box-shadow: var(--shadow-soft); position:relative; overflow:hidden;
+  }
+  .logo::after{content:"✨"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:20px; filter:saturate(1.2)}
+  .title{font-weight:800; letter-spacing:.3px}
+  .subtitle{font-size:12px; color:var(--c-muted)}
+  .tools{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .btn, button{
+    appearance:none; border:none; cursor:pointer; border-radius:12px; padding:10px 14px; font-weight:600;
+    color:#fff; background:linear-gradient(180deg,var(--c-blue),#328ef0);
+    box-shadow: var(--shadow); transition: transform var(--trans), box-shadow var(--trans), opacity var(--trans);
+  }
+  .btn.secondary{ background:linear-gradient(180deg,#8b77ff,#6c59f0); }
+  .btn.ghost{ background:transparent; color:var(--c-text); border:1px solid rgba(0,0,0,.12); box-shadow:none; }
+  @media (prefers-color-scheme: dark){
+    .btn.ghost{border-color:rgba(255,255,255,.16); color:#e9ecff;}
+  }
+  .btn:active{transform:translateY(1px)}
+  .card{
+    background:var(--c-card); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; margin:14px 0;
+  }
+  .grid{display:grid; gap:14px}
+  @media(min-width:900px){ .grid.cols-2{ grid-template-columns:1fr 1fr; } }
+  .field{display:flex; flex-direction:column; gap:8px}
+  .field.inline{flex-direction:row; align-items:center; gap:10px; flex-wrap:wrap}
+  label{font-weight:600}
+  input[type="text"]{
+    padding:12px 12px; border-radius:12px; border:1px solid rgba(0,0,0,.12); background:transparent; color:var(--c-text);
+    outline:none; transition:border-color var(--trans), box-shadow var(--trans);
+  }
+  input[type="text"]:focus{border-color:var(--c-blue); box-shadow:0 0 0 3px rgba(77,163,255,.18)}
+  .muted{color:var(--c-muted); font-size:13px}
+  .progress{height:10px; background:rgba(0,0,0,.08); border-radius:999px; overflow:hidden}
+  .progress>i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--c-green),var(--c-blue)); transition:width 240ms ease}
+  .q-card{display:flex; flex-direction:column; gap:10px}
+  .scale{display:flex; gap:6px; flex-wrap:wrap}
+  .chip{
+    padding:8px 10px; border-radius:12px; border:1px solid rgba(0,0,0,.12);
+    background:rgba(255,255,255,.6); color:var(--c-text); cursor:pointer; user-select:none;
+    transition:all var(--trans);
+    min-width: 44px; text-align:center;
+  }
+  .chip[data-active="true"]{ background:linear-gradient(180deg,var(--c-orange),#ff9800); color:#fff; border-color:transparent; box-shadow:var(--shadow-soft) }
+  .k{font-weight:700; padding:4px 8px; border-radius:8px; background:rgba(0,0,0,.06)}
+  .sep{height:1px; background:rgba(0,0,0,.08); margin:10px 0}
+  .result-type{font-size:34px; font-weight:900; letter-spacing:2px}
+  .badges{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:12px; padding:6px 8px; border-radius:999px; background:rgba(0,0,0,.06)}
+  footer{
+    position:fixed; bottom:0; left:0; right:0; background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.8));
+    border-top:1px solid rgba(0,0,0,.06);
+    backdrop-filter:saturate(1.2) blur(8px);
+  }
+  @media (prefers-color-scheme: dark){
+    footer{ background:linear-gradient(180deg,rgba(20,24,38,.2),rgba(20,24,38,.8)); border-color:rgba(255,255,255,.08);}
+  }
+  .f-inner{max-width:980px; margin:0 auto; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
+  .disclaimer{font-size:12px; color:var(--c-muted)}
+  .sign{font-weight:700}
+  .hidden{display:none !important}
+  .center{display:flex; justify-content:center; align-items:center}
+  .flex{display:flex}
+  .gap8{gap:8px}
+  .gap12{gap:12px}
+  .gap16{gap:16px}
+  .right{margin-left:auto}
+  .pill{padding:6px 10px; border-radius:999px; background:rgba(0,0,0,.06); font-size:12px; display:flex; align-items:center; gap:6px}
+  .note{font-size:12px; color:var(--c-muted)}
+  .toast{
+    position:fixed; left:50%; transform:translateX(-50%) translateY(20px);
+    bottom:80px; background:#222; color:#fff; padding:10px 14px; border-radius:12px; opacity:0; pointer-events:none;
+    transition: all .3s ease; z-index:60; max-width:90%; text-align:center; box-shadow:var(--shadow);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  #confetti{position:fixed; inset:0; pointer-events:none; z-index:40}
+  .reduce-motion *{ transition-duration:0ms !important; animation: none !important }
+
+  /* Hero */
+  .hero{
+    position:relative; overflow:hidden; border-radius:18px;
+    background: radial-gradient(600px 240px at 0% 0%, rgba(77,163,255,.25), transparent 60%),
+                radial-gradient(600px 240px at 100% 0%, rgba(255,184,77,.25), transparent 60%),
+                linear-gradient(180deg, #fff, #f8faff);
+    padding:14px;
+  }
+  .hero .emoji{ font-size:48px; margin-right:8px; filter:saturate(1.1) }
+
+  /* Section blocks */
+  .section{border-radius:16px; padding:14px; background:var(--c-card); box-shadow:var(--shadow); margin:14px 0}
+  .section .head{display:flex; align-items:center; gap:8px; font-weight:800; margin-bottom:10px}
+  .head .h-emoji{font-size:22px}
+
+  /* Axis cards */
+  .axis-grid{display:grid; gap:12px}
+  @media(min-width:700px){ .axis-grid{grid-template-columns:1fr 1fr; } }
+  .axis-card{
+    padding:12px; border-radius:12px; background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.02));
+    border:1px solid rgba(0,0,0,.06);
+    box-shadow:var(--shadow-soft); position:relative; overflow:hidden;
+  }
+  .axis-title{display:flex; align-items:center; gap:8px; font-weight:700}
+  .axis-title .a-emoji{font-size:20px}
+  .bar{position:relative; height:var(--bar-h); background:rgba(0,0,0,.08); border-radius:999px; overflow:hidden; margin-top:8px}
+  .bar>i{position:absolute; inset:0; width:0%; border-radius:999px; background:linear-gradient(90deg,#8B77FF,#4DA3FF); }
+  .shimmer{background:linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.35), rgba(255,255,255,.0));
+           background-size:200% 100%; mix-blend-mode:soft-light; animation:shimmer 1.8s linear infinite;}
+  @keyframes shimmer{ 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
+
+  /* Letter meaning cards */
+  .letters-grid{display:grid; gap:10px}
+  @media(min-width:700px){ .letters-grid{grid-template-columns:1fr 1fr} }
+  .letter-card{
+    display:flex; gap:12px; align-items:center;
+    border-radius:999px; padding:10px 12px;
+    background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.02));
+    border:1px solid rgba(0,0,0,.06);
+    box-shadow:var(--shadow-soft);
+  }
+  .big-letter{
+    width:46px; height:46px; border-radius:50%; color:#fff; font-weight:900; font-size:26px;
+    display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-soft); flex:0 0 auto;
+  }
+  .lt-title{font-weight:800}
+  .lt-desc{color:var(--c-muted); font-size:14px}
+
+  /* Rep cards */
+  .rep-grid{display:grid; gap:10px}
+  @media(min-width:700px){ .rep-grid{grid-template-columns:1fr 1fr} }
+  .rep-card{
+    background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.02)); border-radius:14px; padding:12px; border:1px solid rgba(0,0,0,.06);
+    transition: transform 240ms ease, box-shadow 240ms ease;
+  }
+  .rep-card:hover{ transform:translateY(-2px); box-shadow:0 10px 20px rgba(0,0,0,.08) }
+  .rep-title{font-weight:700; display:flex; align-items:center; gap:6px}
+  .rep-emoji{font-size:18px}
+  .rep-quote{font-style:italic; color:var(--c-muted); margin-top:4px}
+
+  /* Pop-in animation */
+  .pop{opacity:0; transform:translateY(8px); animation:pop .5s ease forwards}
+  .pop.delay1{animation-delay:.05s}
+  .pop.delay2{animation-delay:.1s}
+  .pop.delay3{animation-delay:.15s}
+  .pop.delay4{animation-delay:.2s}
+  @keyframes pop{ to{opacity:1; transform:translateY(0)}}
+
+  /* Music controls */
+  input[type="range"]{ accent-color:#6c59f0; }
+  .range{width:90px; height:28px}
+  audio{ display:none } /* 隐藏原生控件 */
+</style>
+</head>
+<body>
+<header>
+  <div class="h-inner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <div class="title" data-i18n="appTitle">TypeSpark MBTI学生版</div>
+        <div class="subtitle" data-i18n="appSubtitle">5–6分钟完成｜离线可用｜不用于诊断</div>
+      </div>
+    </div>
+    <div class="tools">
+      <div class="pill" role="group" aria-label="语言 Language">
+        <button class="btn ghost" id="lang-zh">中</button>
+        <button class="btn ghost" id="lang-en">EN</button>
+      </div>
+      <div class="pill">
+        <span data-i18n="motion">动效</span>：
+        <button class="btn ghost" id="motion-standard" aria-pressed="true" data-i18n="motionStandard">标准</button>
+        <button class="btn ghost" id="motion-reduced" data-i18n="motionReduced">弱动效</button>
+      </div>
+      <div class="pill" id="music-pill" role="group" aria-label="背景音乐">
+        <span id="music-label">🎵 音乐</span>：
+        <button class="btn ghost" id="music-toggle">开启</button>
+        <span id="music-vol-label">音量</span>
+        <input id="music-vol" class="range" type="range" min="0" max="100" value="20" />
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- 背景音乐：使用你提供的 mp3 -->
+<audio id="bgm-audio" preload="metadata" loop
+  src="https://pfst.cf2.poecdn.net/base/audio/6ea57e7f519a82251db529eb0e29c8948110a73d979b01a6e830442775af8555"></audio>
+
+<canvas id="confetti" class="hidden"></canvas>
+
+<div class="wrap" id="app">
+  <!-- Intro -->
+  <section id="intro" class="card">
+    <h2 style="margin:0 0 6px" data-i18n="welcomeTitle">欢迎！先填写信息后开始</h2>
+    <p class="muted" data-i18n="welcomeTip">说明：本测评仅用于课堂交流与自我了解，非诊断。姓名与班级仅用于结果展示。</p>
+    <div class="grid cols-2">
+      <div class="field">
+        <label for="inp-name" data-i18n="name">姓名</label>
+        <input id="inp-name" type="text" placeholder="例如：张同学" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="inp-class" data-i18n="class">班级</label>
+        <input id="inp-class" type="text" placeholder="例如：初三（2）班 / 高一（5）班" />
+      </div>
+    </div>
+    <div class="field inline">
+      <button class="btn" id="btn-start" data-i18n="start">开始答题 ▶</button>
+    </div>
+    <div class="sep"></div>
+    <div class="disclaimer" data-i18n="disclaimerLong">
+      免责声明：本测评仅用于自我了解与课堂交流，不构成心理诊断或能力评估。结果受题量与当下状态影响，仅供参考，勿贴标签。代表人物为粉丝归类，存在多种解读，不代表任何官方立场。数据不联网、不自动上传。
+    </div>
+  </section>
+
+  <!-- Questions -->
+  <section id="quiz" class="card hidden" aria-live="polite">
+    <div class="field">
+      <div class="flex" style="justify-content:space-between;align-items:center">
+        <div><strong data-i18n="answerAll">请完成所有题目</strong></div>
+        <div class="muted"><span id="count-ans">0</span>/20</div>
+      </div>
+      <div class="progress" aria-hidden="true"><i id="progress"></i></div>
+    </div>
+    <div id="q-list" class="grid"></div>
+    <div class="field inline">
+      <button class="btn" id="btn-submit" data-i18n="submit">提交并查看结果 🎉</button>
+      <button class="btn ghost" id="btn-scrollTop" data-i18n="scrollTop">回到顶部</button>
+      <button class="btn ghost" id="btn-jumpUnanswered" data-i18n="jumpUnanswered">跳到未答</button>
+    </div>
+  </section>
+
+  <!-- Result -->
+  <section id="result" class="card hidden">
+    <!-- HERO -->
+    <div class="hero pop">
+      <div class="flex" style="align-items:center; gap:10px;">
+        <div class="emoji" id="type-emoji">✨</div>
+        <div class="result-type" id="type-code">ENFP</div>
+        <div class="badges">
+          <span class="tag" id="tie-badge" hidden>自动微调已应用</span>
+          <span class="tag" id="name-class"></span>
+        </div>
+        <div class="right">
+          <button class="btn ghost" id="btn-retake" data-i18n="retake">重新作答</button>
+        </div>
+      </div>
+      <div id="type-desc" class="muted" style="margin-top:8px"></div>
+    </div>
+
+    <!-- LETTERS FIRST -->
+    <div class="section pop delay1">
+      <div class="head"><span class="h-emoji">🧩</span><span data-i18n="lettersTitle">这4个字母分别代表什么？</span></div>
+      <div id="letters-wrap" class="letters-grid"></div>
+    </div>
+
+    <!-- AXES AFTER LETTERS -->
+    <div class="section pop delay2">
+      <div class="head"><span class="h-emoji">📊</span><span data-i18n="axesTitle">维度强度</span></div>
+      <div class="axis-grid">
+        <div class="axis-card">
+          <div class="axis-title"><span class="a-emoji">😄🧘</span> E vs I</div>
+          <div class="bar"><i id="bar-EI"></i><div class="shimmer"></div></div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title"><span class="a-emoji">🔍💡</span> S vs N</div>
+          <div class="bar"><i id="bar-SN"></i><div class="shimmer"></div></div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title"><span class="a-emoji">⚙️💞</span> T vs F</div>
+          <div class="bar"><i id="bar-TF"></i><div class="shimmer"></div></div>
+        </div>
+        <div class="axis-card">
+          <div class="axis-title"><span class="a-emoji">📅🎲</span> J vs P</div>
+          <div class="bar"><i id="bar-JP"></i><div class="shimmer"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPS -->
+    <div class="section pop delay3">
+      <div class="head"><span class="h-emoji">🎭</span><span data-i18n="representatives">代表人物（仅供参考）</span></div>
+      <div id="rep" class="rep-grid"></div>
+      <div class="note" data-i18n="repNote" style="margin-top:6px">注：粉丝归类，存在多种解读；不代表官方立场。</div>
+    </div>
+
+    <!-- TIPS & PITFALLS -->
+    <div class="grid cols-2">
+      <div class="section pop delay4">
+        <div class="head"><span class="h-emoji">🛠️</span><span data-i18n="tips">学习建议</span></div>
+        <ul id="tips" style="margin:0 0 0 18px"></ul>
+      </div>
+      <div class="section pop delay4">
+        <div class="head"><span class="h-emoji">🙅</span><span data-i18n="pitfalls">常见误区</span></div>
+        <ul id="pitfalls" style="margin:0 0 0 18px"></ul>
+      </div>
+    </div>
+
+    <div class="field inline gap8">
+      <button class="btn secondary pop delay4" id="btn-share" data-i18n="makeShare">生成结果图片</button>
+    </div>
+
+    <canvas id="share-canvas" class="hidden" width="900" height="1300" aria-hidden="true"></canvas>
+  </section>
+</div>
+
+<footer>
+  <div class="f-inner">
+    <div class="disclaimer" id="footer-disclaimer">
+      免责声明：本测评仅用于自我了解与课堂交流，不构成心理诊断或能力评估。结果受题量与当下状态影响，仅供参考，勿贴标签。代表人物为粉丝归类，存在多种解读，不代表任何官方立场。数据不联网、不自动上传。
+    </div>
+    <div class="sign">由 Hannah 制作</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
+
+<script>
+/* ---------- i18n 文案 ---------- */
+const i18n = {
+  zh:{
+    appTitle:"TypeSpark MBTI学生版",
+    appSubtitle:"5–6分钟完成｜离线可用｜不用于诊断",
+    welcomeTitle:"欢迎！先填写信息后开始",
+    welcomeTip:"说明：本测评仅用于课堂交流与自我了解，非诊断。姓名与班级仅用于结果展示。",
+    name:"姓名", class:"班级", start:"开始答题 ▶",
+    answerAll:"请完成所有题目", submit:"提交并查看结果 🎉",
+    scrollTop:"回到顶部", jumpUnanswered:"跳到未答", retake:"重新作答",
+    representatives:"代表人物（仅供参考）", repNote:"注：粉丝归类，存在多种解读；不代表官方立场。",
+    tips:"学习建议", pitfalls:"常见误区", makeShare:"生成结果图片",
+    motion:"动效", motionStandard:"标准", motionReduced:"弱动效",
+    disclaimerLong:"免责声明：本测评仅用于自我了解与课堂交流，不构成心理诊断或能力评估。结果受题量与当下状态影响，仅供参考，勿贴标签。代表人物为粉丝归类，存在多种解读，不代表任何官方立场。数据不联网、不自动上传。",
+    scale:{1:"非常不符合",2:"不太符合",3:"一般/不确定",4:"比较符合",5:"非常符合"},
+    lettersTitle:"这4个字母分别代表什么？",
+    axesTitle:"维度强度",
+    shareTitle:"TypeSpark 结果卡", labelName:"姓名", labelClass:"班级",
+    shareFooter:"由 Hannah 制作｜仅供参考", tieBadge:"自动微调已应用",
+    music:"音乐", musicOn:"开启", musicOff:"关闭", volume:"音量"
+  },
+  en:{
+    appTitle:"TypeSpark MBTI Student",
+    appSubtitle:"5–6 min | Offline | Not for diagnosis",
+    welcomeTitle:"Welcome! Fill in info to begin",
+    welcomeTip:"Note: For classroom reflection only; Name/Class appear on your result.",
+    name:"Name", class:"Class", start:"Start ▶",
+    answerAll:"Please answer all questions", submit:"Submit & See Results 🎉",
+    scrollTop:"Back to top", jumpUnanswered:"Jump to unanswered", retake:"Retake",
+    representatives:"Representative Figures (for fun)", repNote:"Fan-attributed; multiple interpretations; not official.",
+    tips:"Study Tips", pitfalls:"Common Misconceptions", makeShare:"Make Share Image",
+    motion:"Motion", motionStandard:"Standard", motionReduced:"Reduced",
+    disclaimerLong:"Disclaimer: For reflection only, not diagnostic. Results vary; don't label others. No uploads.",
+    scale:{1:"Strongly Disagree",2:"Disagree",3:"Neutral/Unsure",4:"Agree",5:"Strongly Agree"},
+    lettersTitle:"What do these 4 letters mean?",
+    axesTitle:"Axes Balance",
+    shareTitle:"TypeSpark Result Card", labelName:"Name", labelClass:"Class",
+    shareFooter:"Made by Hannah | For reference only", tieBadge:"Auto tie-break applied",
+    music:"Music", musicOn:"On", musicOff:"Off", volume:"Vol"
+  }
+};
+
+/* ---------- 题库 ---------- */
+const QUESTIONS = [
+  {id:1, zh:"在一群不太熟的人里，我也能很快聊起来。", en:"In a group of unfamiliar people, I can strike up conversations quickly.", dim:"EI", side:"E", anchor:true},
+  {id:2, zh:"参加完热闹活动后，我需要一个人安静一会儿。", en:"After lively events, I need quiet alone time to recharge.", dim:"EI", side:"I"},
+  {id:3, zh:"听到一个新话题，我更愿意先说说看法再慢慢想。", en:"With a new topic, I tend to speak first and think it through as I go.", dim:"EI", side:"E"},
+  {id:4, zh:"有空时，我更喜欢独处做自己的小兴趣。", en:"In free time, I prefer solo hobbies over social activities.", dim:"EI", side:"I"},
+  {id:5, zh:"长时间独处会让我感觉精力下降。", en:"Too much time alone drains my energy.", dim:"EI", side:"E"},
+  {id:6, zh:"我更信赖能被证明的事实，而不是“灵感直觉”。", en:"I trust verifiable facts more than flashes of intuition.", dim:"SN", side:"S"},
+  {id:7, zh:"我常常先有一个整体想法，再去补细节。", en:"I often jump to a big picture idea and fill details later.", dim:"SN", side:"N", anchor:true},
+  {id:8, zh:"做计划时，我喜欢一步一步按流程来。", en:"When planning, I prefer step-by-step procedures.", dim:"SN", side:"S"},
+  {id:9, zh:"面对题目，我会先想“还有没有更特别的做法”。", en:"Facing a task, I first think: is there a more novel way?", dim:"SN", side:"N"},
+  {id:10, zh:"相比现在，我更被未来的可能性所吸引。", en:"I'm more drawn to future possibilities than the present details.", dim:"SN", side:"N"},
+  {id:11, zh:"做决定时，我优先考虑规则和逻辑是否一致。", en:"When deciding, I prioritize consistency of rules and logic.", dim:"TF", side:"T"},
+  {id:12, zh:"如果一个做法会伤害到别人感受，我会重新权衡。", en:"If a choice may hurt others' feelings, I reconsider.", dim:"TF", side:"F", anchor:true},
+  {id:13, zh:"接受批评时，我更想知道具体事实与证据。", en:"When criticized, I want concrete facts and evidence.", dim:"TF", side:"T"},
+  {id:14, zh:"我常把维护和谐关系放在结果之前。", en:"I often prioritize harmony over outcomes.", dim:"TF", side:"F"},
+  {id:15, zh:"当“合理”和“顾及感受”冲突时，我会尽量寻找两全方案。", en:"When logic and feelings conflict, I seek a both-win solution.", dim:"TF", side:"F"},
+  {id:16, zh:"我喜欢尽早把事情定下来，有明确的时间表。", en:"I prefer to decide early and have a clear schedule.", dim:"JP", side:"J", anchor:true},
+  {id:17, zh:"计划被打乱时，我也能迅速即兴调整。", en:"When plans change, I can adapt quickly and improvise.", dim:"JP", side:"P"},
+  {id:18, zh:"我习惯把任务提前完成，而不是最后一天赶。", en:"I tend to finish tasks early rather than at the last minute.", dim:"JP", side:"J"},
+  {id:19, zh:"我更享受保持选择的开放，而不是过早定案。", en:"I enjoy keeping options open rather than deciding too early.", dim:"JP", side:"P"},
+  {id:20, zh:"面对作业，我会先开工，边做边调整方向。", en:"For assignments, I start and adjust direction as I go.", dim:"JP", side:"P"},
+];
+
+/* ---------- 字母信息（大字母 + 英文 + 中文 + 解释） ---------- */
+const LETTER_INFO = {
+  E:{emoji:'😄', en:'Extraversion', zh:'外向', desc:{zh:'从与人互动中“充电”，常边说边想。', en:'Energized by interaction; think while speaking.'}},
+  I:{emoji:'🧘', en:'Introversion', zh:'内向', desc:{zh:'从独处中“充电”，先想好再开口。', en:'Energized by solitude; think before speaking.'}},
+  S:{emoji:'🔍', en:'Sensing', zh:'实感', desc:{zh:'重视现在与细节，脚踏实地。', en:'Focus on facts and details; grounded.'}},
+  N:{emoji:'💡', en:'iNtuition', zh:'直觉', desc:{zh:'关注可能性与大图景，爱联想。', en:'See possibilities and the big picture.'}},
+  T:{emoji:'⚙️', en:'Thinking', zh:'思考', desc:{zh:'优先逻辑与原则，讲道理。', en:'Prioritize logic and principles.'}},
+  F:{emoji:'💞', en:'Feeling', zh:'情感', desc:{zh:'优先人和感受，讲共情。', en:'Prioritize people and feelings.'}},
+  J:{emoji:'📅', en:'Judging', zh:'判断', desc:{zh:'喜欢定计划，有节奏地推进。', en:'Prefer plans and structure.'}},
+  P:{emoji:'🎲', en:'Perceiving', zh:'感知', desc:{zh:'保持灵活，边走边调。', en:'Prefer flexibility and spontaneity.'}},
+};
+const LETTER_GRADS = {
+  E:['#8B77FF','#4DA3FF'], I:['#66E3A4','#4DA3FF'], S:['#4DA3FF','#79C8FF'], N:['#FFB84D','#FF9E4D'],
+  T:['#66E3A4','#2ECC9A'], F:['#FF6B6B','#FF8FA3'], J:['#FFB84D','#FFC46B'], P:['#4DA3FF','#66E3A4']
+};
+
+/* ---------- 类型档案（含代表人物） ---------- */
+const TYPE_PROFILES = {
+  ISTJ:{ emoji:'🛡️',
+    desc:{ zh:"注重事实与责任，做事可靠稳健。喜欢明确规则和步骤，擅长长期坚持。", en:"Reliable, fact-focused, and responsible. Prefer clear rules and steady follow-through." },
+    reps:{ zh:[{name:"Captain America 史蒂夫·罗杰斯（Marvel）", why:"纪律感强、守规矩、说到做到。", quote:"I can do this all day."},{name:"郭靖（射雕英雄传）", why:"踏实守信，练功按步骤来，可靠队友。", quote:"按师父教的来。"}],
+           en:[{name:"Captain America (Marvel)", why:"Disciplined, duty-driven, keeps promises.", quote:"I can do this all day."},{name:"Guo Jing (Legend of the Condor Heroes)", why:"Steady and trustworthy; follows rules.", quote:"Follow the master's teaching."}] }
+  },
+  ISFJ:{ emoji:'🫶',
+    desc:{ zh:"温和体贴、认真守护他人。重视细节与秩序，喜欢让周围更稳定安心。", en:"Gentle, caring, detail-oriented; keep things steady and safe for others." },
+    reps:{ zh:[{name:"Samwise 山姆（LOTR）", why:"默默照顾同伴、能吃苦、耐心细致。", quote:"我不会抛下你，佛罗多先生。"}, {name:"沙悟净（西游记）", why:"稳重老实、收拾残局的守护型伙伴。", quote:"师父慢走，谨慎为上。"}],
+           en:[{name:"Samwise Gamgee (LOTR)", why:"Quietly supportive, loyal, diligent.", quote:"I won't leave you, Mr. Frodo."}, {name:"Sha Wujing (Journey to the West)", why:"Calm, reliable, keeps team steady.", quote:"Steady and careful."}] }
+  },
+  INFJ:{ emoji:'🔮',
+    desc:{ zh:"洞察人心、关注意义。常从宏观愿景思考问题，重视价值观与长远影响。", en:"Insightful and purpose-driven; big-picture thinkers guided by values." },
+    reps:{ zh:[{name:"艾莎 Elsa（Frozen）", why:"渴望做正确的事，内在价值感强。", quote:"Let it go."},{name:"梅长苏（琅琊榜）", why:"心有大义、谋划长远、关照众人命运。", quote:"既然选择了，就走到底。"}],
+           en:[{name:"Elsa (Frozen)", why:"Values-driven, seeks the right thing.", quote:"Let it go."},{name:"Mei Changsu (Nirvana in Fire)", why:"Visionary strategist for a just cause.", quote:"See it through."}] }
+  },
+  INTJ:{ emoji:'♟️',
+    desc:{ zh:"善于系统规划与策略思考，喜欢高效与自洽的方案。独立冷静，面向长期目标。", en:"Strategic and systematic; independent, long-term planners." },
+    reps:{ zh:[{name:"奇异博士 Doctor Strange（Marvel）", why:"理性计算、预演未来、寻求最佳解。", quote:"I've seen 14,000,605 outcomes."},{name:"诸葛亮（三国演义）", why:"运筹帷幄、讲求策略与效率。", quote:"未雨绸缪，方能致胜。"}],
+           en:[{name:"Doctor Strange (Marvel)", why:"Calculates scenarios and optimizes outcomes.", quote:"I've seen 14,000,605 outcomes."},{name:"Zhuge Liang (Romance of the Three Kingdoms)", why:"Strategic mastermind.", quote:"Prepare before it rains."}] }
+  },
+  ISTP:{ emoji:'🛠️',
+    desc:{ zh:"冷静实干、喜欢动手解决问题。遇到挑战能迅速分析并采取行动。", en:"Calm, hands-on problem solvers who act swiftly under pressure." },
+    reps:{ zh:[{name:"黑寡妇 Black Widow（Marvel）", why:"临场反应快，擅长实际操作。", quote:"I get the job done."},{name:"武松（水浒传）", why:"当机立断，动手能力强。", quote:"路见不平，拔刀相助。"}],
+           en:[{name:"Black Widow (Marvel)", why:"Quick, tactical, action-first.", quote:"I get the job done."},{name:"Wu Song (Water Margin)", why:"Decisive and skillful.", quote:"Help when injustice appears."}] }
+  },
+  ISFP:{ emoji:'🎨',
+    desc:{ zh:"温柔内敛、重视当下体验与个人价值。对美感与和谐敏感，做事真诚自然。", en:"Gentle and authentic; sensitive to aesthetics and harmony." },
+    reps:{ zh:[{name:"莱戈拉斯 Legolas（LOTR）", why:"安静敏锐、动作优雅。", quote:"The forest speaks."},{name:"小龙女（神雕侠侣）", why:"清冷自持、重情真诚。", quote:"既然认定，就不变。"}],
+           en:[{name:"Legolas (LOTR)", why:"Quietly precise, graceful.", quote:"The forest speaks."},{name:"Xiaolongnu (ROCH)", why:"Calm, sincere.", quote:"Once chosen, unwavering."}] }
+  },
+  INFP:{ emoji:'🌈',
+    desc:{ zh:"理想主义且富同理心，关注内在价值与个人意义。", en:"Idealistic and empathetic; value inner meaning." },
+    reps:{ zh:[{name:"佛罗多 Frodo（LOTR）", why:"背负使命也不放弃善良。", quote:"我把它带到末日火山。"}, {name:"林黛玉（红楼梦）", why:"情感细腻、真诚敏感。", quote:"质本洁来还洁去。"}],
+           en:[{name:"Frodo (LOTR)", why:"Guards kindness under burden.", quote:"I will take the Ring to Mordor."},{name:"Lin Daiyu (DRC)", why:"Sensitive and sincere.", quote:"Pure at heart."}] }
+  },
+  INTP:{ emoji:'🧠',
+    desc:{ zh:"好奇心强、擅长分析，喜欢拆解问题与构建模型。", en:"Curious analysts who deconstruct problems and build models." },
+    reps:{ zh:[{name:"舒莉 Shuri（Black Panther）", why:"技术脑洞多、热爱发明。", quote:"Just improve it."},{name:"福尔摩斯 Sherlock Holmes", why:"推理至上，逻辑刨根问底。", quote:"数据！给我数据！"}],
+           en:[{name:"Shuri (Black Panther)", why:"Inventive, analytical.", quote:"Just because it works can still be improved."},{name:"Sherlock Holmes", why:"Logic-first detective.", quote:"Data, data, data!"}] }
+  },
+  ESTP:{ emoji:'⚡',
+    desc:{ zh:"行动派与现实主义者，喜欢直接上手、现场优化。", en:"Action-oriented realists who optimize on the spot." },
+    reps:{ zh:[{name:"杰克·斯派罗 Jack Sparrow", why:"临场反应快、会玩转局面。", quote:"带点小计划。"}, {name:"李逵（水浒传）", why:"直接、痛快、重行动。", quote:"有事就上！"}],
+           en:[{name:"Jack Sparrow", why:"Witty, spontaneous.", quote:"I've got a plan... sort of."},{name:"Li Kui (Water Margin)", why:"Direct and action-first.", quote:"Go for it!"}] }
+  },
+  ESFP:{ emoji:'🎉',
+    desc:{ zh:"热情外向、带动气氛，乐于分享与尝试。", en:"Energetic, people-focused, love sharing and new experiences." },
+    reps:{ zh:[{name:"蚁人 Scott Lang（Marvel）", why:"乐观会玩梗，带动团队气氛。", quote:"这不就是个大点的事吗？"}, {name:"猪八戒（西游记）", why:"爱热闹、有人情味。", quote:"师兄别急，先吃口儿再说。"}],
+           en:[{name:"Ant-Man Scott Lang (Marvel)", why:"Playful and upbeat.", quote:"It's just... bigger."},{name:"Zhu Bajie (JTTW)", why:"Fun-loving, people-oriented.", quote:"Don't rush, enjoy the bite."}] }
+  },
+  ENFP:{ emoji:'✨',
+    desc:{ zh:"创意充沛、乐观外向。对可能性敏感，喜欢合作共创。", en:"Creative and enthusiastic; sensitive to possibilities; collaborative." },
+    reps:{ zh:[{name:"蜘蛛侠 Peter Parker（Marvel）", why:"热心助人、点子多。", quote:"能力越大，责任越大。"}, {name:"哪吒（哪吒之魔童降世）", why:"不按套路、燃点高。", quote:"我命由我，不由天。"}],
+           en:[{name:"Spider-Man (Marvel)", why:"Helpful, witty.", quote:"With great power comes great responsibility."},{name:"Nezha", why:"Unconventional and fiery.", quote:"My fate is mine."}] }
+  },
+  ENTP:{ emoji:'🚀',
+    desc:{ zh:"善于辩思与跨界联想，喜欢尝试新奇做法，挑战设定。", en:"Debaters and tinkerers; love novel approaches and challenging assumptions." },
+    reps:{ zh:[{name:"托尼·斯塔克 Iron Man（Marvel）", why:"脑洞与实验不停，敢开新路。", quote:"我就是钢铁侠。"}, {name:"孙悟空（西游记）", why:"不按常规、点子多。", quote:"俺老孙来也！"}],
+           en:[{name:"Tony Stark (Marvel)", why:"Inventive, bold.", quote:"I am Iron Man."},{name:"Sun Wukong (JTTW)", why:"Rule-bender with tricks.", quote:"Here comes the Monkey King!"}] }
+  },
+  ESTJ:{ emoji:'📣',
+    desc:{ zh:"组织与执行力强，追求清晰规则与效率，推动事情落地。", en:"Organized, efficient drivers who get things done." },
+    reps:{ zh:[{name:"尼克·弗瑞 Nick Fury（Marvel）", why:"搭班子、定目标、派任务。", quote:"复仇者，集合。"}, {name:"关羽（三国演义）", why:"守规则、讲信义、说干就干。", quote:"义字当头。"}],
+           en:[{name:"Nick Fury (Marvel)", why:"Builds teams, sets missions.", quote:"Avengers, assemble."},{name:"Guan Yu (RTK)", why:"Duty-bound and decisive.", quote:"Honor first."}] }
+  },
+  ESFJ:{ emoji:'🤝',
+    desc:{ zh:"体贴务实，重视团队氛围与协作，善于协调与支持。", en:"Caring, practical coordinators who keep teams harmonious." },
+    reps:{ zh:[{name:"安娜 Anna（Frozen）", why:"热心照顾他人、主动维护关系。", quote:"我陪你。"}, {name:"刘备（三国演义）", why:"善结人心、会组织团队。", quote:"同心协力。"}],
+           en:[{name:"Anna (Frozen)", why:"Warm, relationship-centered.", quote:"I'm with you."},{name:"Liu Bei (RTK)", why:"Unites people.", quote:"Work as one."}] }
+  },
+  ENFJ:{ emoji:'🌟',
+    desc:{ zh:"富有感染力的引导者，关注他人成长与共同目标。", en:"Inspiring mentors focused on growth and shared goals." },
+    reps:{ zh:[{name:"阿不思·邓布利多（Harry Potter）", why:"引导学生、强调选择与担当。", quote:"决定我们的是选择。"}, {name:"木法沙 Mufasa（The Lion King）", why:"以身作则、守护族群。", quote:"记住你是谁。"}],
+           en:[{name:"Albus Dumbledore", why:"Guides others; values choices.", quote:"It is our choices that show who we are."},{name:"Mufasa", why:"Lead by example.", quote:"Remember who you are."}] }
+  },
+  ENTJ:{ emoji:'🏆',
+    desc:{ zh:"目标导向、果断决策，善于整合资源实现愿景。", en:"Decisive, goal-driven leaders who build systems to realize visions." },
+    reps:{ zh:[{name:"灭霸 Thanos（Marvel）", why:"强烈目标感，统筹全局（虚构角色，仅作原型）。", quote:"我命中注定。"}, {name:"曹操（三国演义）", why:"雄才大略、组织整合能力强。", quote:"形象多有争议，此处仅作典型。"}],
+           en:[{name:"Thanos (Marvel)", why:"Relentless vision (fictional archetype).", quote:"I am inevitable."},{name:"Cao Cao (RTK)", why:"Ambitious organizer.", quote:"Archetypal commander."}] }
+  }
+};
+
+/* ---------- 建议 & 误区（口语化） ---------- */
+const SUGGESTIONS = {
+  zh:{
+    E:["发言前先列3个关键词，更聚焦。","讨论时给内向同学1分钟安静思考。"],
+    I:["重要发言先写要点卡，底气更足。","不想抢话就先点个赞，再补观点。"],
+    S:["先把“例题+步骤”吃透，再上难题。","笔记标注：事实/数据/步骤。"],
+    N:["把好点子落成“三步走”。","每段时间做现实检查：目标→证据→下一步。"],
+    T:["结论后加一句“对人的影响”。","决策列出两条原则和一条例外。"],
+    F:["表达关心的同时，也补上两个客观事实。","先复述对方观点，空气会柔和很多。"],
+    J:["计划里预留10–20%缓冲。","把大任务拆成小卡片，步步推进。"],
+    P:["先做最小可行版本（MVP）。","设一个软DDL，避免最后一晚爆冲。"]
+  },
+  en:{
+    E:["Outline 3 keywords first.","Give quiet peers a 1‑min think time."],
+    I:["Write a cue card before speaking.","Nod first, then add your points."],
+    S:["Master examples and steps first.","Tag notes: fact/data/step."],
+    N:["Turn ideas into a 3‑step plan.","Do a reality check regularly."],
+    T:["State people impact after your logic.","List two principles + one exception."],
+    F:["Pair empathy with two facts.","Paraphrase first to lower tension."],
+    J:["Leave 10–20% buffer.","Break tasks into bite-size cards."],
+    P:["Build an MVP and iterate.","Set a soft deadline to avoid rush."]
+  }
+};
+const PITFALLS = {
+  zh:{
+    E:["外向不等于爱抢话；会倾听的外向更有魅力。","爱社交≠一定会领导，领导力要练出来。"],
+    I:["喜欢安静不等于“社恐”，你只是需要独处来充电。","少说话≠没想法，准备好再说即可。"],
+    S:["重细节不等于没创意，你是在打地基。","爱证据不代表保守。"],
+    N:["想象多不等于不踏实，把想法落地就很强。","脑洞大也别跳过基本功。"],
+    T:["讲逻辑不等于冷漠，语气柔和一样清晰。","直来直去≠不给面子，先确认感受更好沟通。"],
+    F:["顾及感受不等于不理性，你只是多看了一步人心。","善良≠好说话，边界感很重要。"],
+    J:["爱计划不等于死板，预留弹性就很稳。","把事定下来≠控制别人，是为了效率。"],
+    P:["灵活不等于拖延，设小里程碑就行。","不想太早定案≠没主见，你在收集信息。"]
+  },
+  en:{
+    E:["Extravert ≠ interrupter; listening makes you shine.","People‑person ≠ automatic leader; it’s trained."],
+    I:["Quiet ≠ shy; you recharge alone.","Few words ≠ few ideas; prep then speak."],
+    S:["Detail focus ≠ no creativity; it’s the foundation.","Evidence‑loving ≠ conservative."],
+    N:["Imagination ≠ impractical; ship it.","Big ideas still need basics."],
+    T:["Logical ≠ cold; warm tone still clear.","Direct ≠ rude; acknowledge feelings first."],
+    F:["Empathy ≠ illogical; it's human data too.","Kind ≠ push‑over; boundaries matter."],
+    J:["Planning ≠ rigid; add buffer and flex.","Deciding early ≠ controlling others—clarity helps."],
+    P:["Flexible ≠ procrastinator; use mini‑milestones.","Keeping options open ≠ no opinion; gathering info."]
+  }
+};
+
+/* ---------- 工具 & 状态 ---------- */
+const $ = s=>document.querySelector(s);
+const $$ = s=>Array.from(document.querySelectorAll(s));
+const state = { lang:'zh', motion:'standard', answers:{}, shuffled:[], name:'', cls:'', result:null, tieBreakUsed:false,
+  music:{ enabled:false, volume:0.2 } };
+
+/* ---------- 小工具 ---------- */
+function showToast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); }
+function shuffle(a){ return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]); }
+function avg(arr){ return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0; }
+
+/* ---------- 语言 & 动效 ---------- */
+function applyLang(){
+  const dict=i18n[state.lang];
+  $$('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n'); const parts=key.split('.'); let val=dict;
+    for(const p of parts){ val=val?.[p]; }
+    if(typeof val==='string') el.textContent=val;
+  });
+  $('#footer-disclaimer').textContent=dict.disclaimerLong;
+  $$('.chip[data-val]').forEach(ch=>{ ch.textContent=dict.scale[ch.getAttribute('data-val')] || ch.getAttribute('data-val'); });
+  $$('.q-text').forEach(el=>{ const id=+el.getAttribute('data-id'); const q=QUESTIONS.find(x=>x.id===id); el.textContent=state.lang==='zh'?q.zh:q.en; });
+  // 音乐文案
+  $('#music-label').textContent = `🎵 ${dict.music}`;
+  $('#music-toggle').textContent = state.music.enabled ? dict.musicOff : dict.musicOn;
+  $('#music-vol-label').textContent = dict.volume;
+  renderLetterCards();
+}
+function setLang(lang){ state.lang=lang; document.documentElement.lang=lang==='zh'?'zh':'en'; applyLang(); showToast(lang==='zh'?'已切换为中文':'Switched to English'); }
+function setMotion(mode){
+  state.motion=mode;
+  if(mode==='reduced' || matchMedia('(prefers-reduced-motion: reduce)').matches){ document.body.classList.add('reduce-motion'); }
+  else document.body.classList.remove('reduce-motion');
+}
+
+/* ---------- 题目渲染 ---------- */
+function renderQuestions(){
+  const byDim={EI:[],SN:[],TF:[],JP:[]};
+  QUESTIONS.forEach(q=>byDim[q.dim].push(q));
+  Object.keys(byDim).forEach(k=>byDim[k]=shuffle(byDim[k]));
+  const interleaved=[]; for(let i=0;i<5;i++) interleaved.push(byDim.EI[i],byDim.SN[i],byDim.TF[i],byDim.JP[i]);
+  state.shuffled=interleaved.filter(Boolean);
+  const list=$('#q-list'); list.innerHTML='';
+  state.shuffled.forEach((q,idx)=>{
+    const card=document.createElement('div'); card.className='q-card card';
+    card.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div><span class="k">Q${idx+1}</span> <span class="q-text" data-id="${q.id}">${state.lang==='zh'?q.zh:q.en}</span></div>
+        <span class="tag">${q.dim}</span>
+      </div>
+      <div class="scale" role="group" aria-label="Q${idx+1}">
+        ${[1,2,3,4,5].map(v=>`<span class="chip" data-q="${q.id}" data-val="${v}" role="button" tabindex="0">${i18n[state.lang].scale[v]}</span>`).join('')}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+  $$('.chip').forEach(ch=>{ ch.addEventListener('click',()=>onChoose(ch)); ch.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); onChoose(ch);} }); });
+  applyLang(); updateProgress();
+}
+function onChoose(ch){
+  const qid=+ch.getAttribute('data-q'); const val=+ch.getAttribute('data-val');
+  state.answers[qid]=val; $$(`.chip[data-q="${qid}"]`).forEach(c=>c.setAttribute('data-active','false')); ch.setAttribute('data-active','true'); updateProgress();
+}
+function updateProgress(){ const answered=Object.keys(state.answers).length; $('#count-ans').textContent=answered; $('#progress').style.width=`${Math.round(answered/20*100)}%`; }
+
+/* ---------- 计分 ---------- */
+function computeResult(){
+  const dims={ EI:{pos:'E',neg:'I',E:[],I:[]}, SN:{pos:'S',neg:'N',S:[],N:[]}, TF:{pos:'T',neg:'F',T:[],F:[]}, JP:{pos:'J',neg:'P',J:[],P:[]} };
+  const missing=[];
+  QUESTIONS.forEach(q=>{ const v=state.answers[q.id]; if(!v) missing.push(q.id); const delta=(v??3)-3; dims[q.dim][q.side].push({id:q.id,v:(v??3),delta}); });
+  if(missing.length) return {error:true,missing};
+  const result={letters:[], nets:{}, strengths:{}, tieBreak:false, percents:{}};
+  for(const key of ['EI','SN','TF','JP']){
+    const d=dims[key], pos=d.pos, neg=d.neg;
+    const net=d[pos].reduce((s,x)=>s+x.delta,0) - d[neg].reduce((s,x)=>s+x.delta,0);
+    result.nets[key]=net; result.strengths[key]=Math.round(Math.abs(net)/10*100);
+    let letter;
+    if(net>0) letter=pos; else if(net<0) letter=neg;
+    else{
+      const mp=avg(d[pos].map(x=>x.v)), mn=avg(d[neg].map(x=>x.v));
+      if(mp>mn) letter=pos; else if(mp<mn) letter=neg;
+      else{
+        const anchor=QUESTIONS.find(q=>q.dim===key && q.anchor); const av=state.answers[anchor.id];
+        if(av>3) letter=anchor.side; else if(av<3) letter=(anchor.side===pos?neg:pos); else letter=pos;
+      }
+      result.tieBreak=true;
+    }
+    result.letters.push(letter);
+    const leftPct=Math.round((net+10)/20*100);
+    result.percents[key]={[pos]:leftPct,[neg]:100-leftPct};
+  }
+  result.code=result.letters.join('');
+  return result;
+}
+
+/* ---------- 结果渲染 ---------- */
+const TYPE_EMOJIS = { ISTJ:'🛡️', ISFJ:'🫶', INFJ:'🔮', INTJ:'♟️', ISTP:'🛠️', ISFP:'🎨', INFP:'🌈', INTP:'🧠', ESTP:'⚡', ESFP:'🎉', ENFP:'✨', ENTP:'🚀', ESTJ:'📣', ESFJ:'🤝', ENFJ:'🌟', ENTJ:'🏆' };
+
+function renderResult(){
+  const r=state.result; const prof=TYPE_PROFILES[r.code];
+  $('#type-code').textContent=r.code;
+  $('#type-emoji').textContent = TYPE_EMOJIS[r.code] || prof?.emoji || '✨';
+  const tie=$('#tie-badge'); tie.hidden=!r.tieBreak; tie.textContent=i18n[state.lang].tieBadge;
+  $('#name-class').textContent=`${i18n[state.lang].labelName||'姓名'}: ${state.name} · ${i18n[state.lang].labelClass||'班级'}: ${state.cls}`;
+  $('#type-desc').textContent=prof?.desc?.[state.lang]||'';
+
+  // 字母解释
+  renderLetterCards();
+
+  // 维度条
+  animateBar('#bar-EI', r.percents.EI.E/100, ['#8B77FF','#4DA3FF']);
+  animateBar('#bar-SN', r.percents.SN.S/100, ['#4DA3FF','#FFB84D']);
+  animateBar('#bar-TF', r.percents.TF.T/100, ['#66E3A4','#FF6B6B']);
+  animateBar('#bar-JP', r.percents.JP.J/100, ['#FFB84D','#4DA3FF']);
+
+  // 代表人物
+  const repDiv=$('#rep'); repDiv.innerHTML='';
+  (prof?.reps?.[state.lang]||[]).forEach((rp,i)=>{
+    const em = ['🎯','🎬','📖','⭐','🧭'][i%5];
+    const card=document.createElement('div'); card.className='rep-card';
+    card.innerHTML=`<div class="rep-title"><span class="rep-emoji">${em}</span>${rp.name}</div>
+                    <div class="muted" style="margin-top:4px">${rp.why}</div>
+                    <div class="rep-quote">“${rp.quote}”</div>`;
+    repDiv.appendChild(card);
+  });
+
+  // 建议/误区
+  const tipsUl=$('#tips'); tipsUl.innerHTML='';
+  const pitsUl=$('#pitfalls'); pitsUl.innerHTML='';
+  const dictS=SUGGESTIONS[state.lang], dictP=PITFALLS[state.lang];
+  const L=r.letters;
+  [L[0],L[1],L[2],L[3]].forEach(ch=>{
+    (dictS[ch]||[]).forEach(t=>{ const li=document.createElement('li'); li.textContent=t+' ✅'; tipsUl.appendChild(li); });
+    (dictP[ch]||[]).forEach(t=>{ const li=document.createElement('li'); li.textContent='🚫 '+t; pitsUl.appendChild(li); });
+  });
+
+  if(state.motion!=='reduced' && !matchMedia('(prefers-reduced-motion: reduce)').matches) launchConfetti();
+}
+function animateBar(sel, ratio, colors){
+  const el = document.querySelector(sel);
+  el.style.width='0%';
+  el.style.background=`linear-gradient(90deg, ${colors[0]}, ${colors[1]})`;
+  setTimeout(()=>{ el.style.transition='width 900ms cubic-bezier(.2,.8,.2,1)'; el.style.width = `${Math.max(2, Math.round(ratio*100))}%`; }, 30);
+}
+
+/* 渲染“字母含义”大卡片 */
+function renderLetterCards(){
+  const wrap = $('#letters-wrap'); if(!wrap) return;
+  wrap.innerHTML='';
+  const order = ['E','I','S','N','T','F','J','P'];
+  order.forEach((k,i)=>{
+    const info = LETTER_INFO[k];
+    const card = document.createElement('div');
+    card.className='letter-card pop';
+    card.style.animationDelay = `${i*0.04}s`;
+    const [g1,g2] = LETTER_GRADS[k];
+    card.innerHTML = `
+      <div class="big-letter" style="background:linear-gradient(180deg,${g1},${g2})">${k}</div>
+      <div>
+        <div class="lt-title">${info.emoji} ${k} · ${info.en} · ${info.zh}</div>
+        <div class="lt-desc">${info.desc[state.lang]}</div>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+/* ---------- 彩带 ---------- */
+function launchConfetti(){
+  const canvas=$('#confetti'), ctx=canvas.getContext('2d');
+  canvas.width=innerWidth; canvas.height=innerHeight; canvas.classList.remove('hidden');
+  const colors=['#4DA3FF','#8B77FF','#FFB84D','#66E3A4','#ffd166','#ff6b6b','#FF6B9A'];
+  const pieces=Array.from({length:140}).map(()=>({x:Math.random()*canvas.width,y:-20-Math.random()*canvas.height/2,w:6+Math.random()*6,h:10+Math.random()*10,c:colors[Math.floor(Math.random()*colors.length)],vY:2+Math.random()*3,vX:-1+Math.random()*2,rot:Math.random()*Math.PI,vr:-0.1+Math.random()*0.2}));
+  let t=0,maxT=1800;
+  function frame(){
+    t+=16; ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{ p.x+=p.vX; p.y+=p.vY; p.rot+=p.vr; if(p.y>canvas.height+30){p.y=-20; p.x=Math.random()*canvas.width;} ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); });
+    if(t<maxT && state.motion!=='reduced') requestAnimationFrame(frame); else canvas.classList.add('hidden');
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- 分享图片（不含二维码） ---------- */
+$('#btn-share').addEventListener('click', ()=>{
+  const r=state.result, W=900, H=1300;
+  const canvas=$('#share-canvas'), ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  const grad=ctx.createLinearGradient(0,0,0,H); grad.addColorStop(0,'#f6f8ff'); grad.addColorStop(1,'#fefaf5'); ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle='#2f2f33'; ctx.font='bold 40px system-ui';
+  ctx.fillText(i18n[state.lang].shareTitle, 40, 70);
+  ctx.font='28px system-ui';
+  ctx.fillText(`${i18n[state.lang].labelName}: ${state.name}`, 40, 120);
+  ctx.fillText(`${i18n[state.lang].labelClass}: ${state.cls}`, 40, 160);
+
+  ctx.font='bold 80px system-ui'; ctx.fillStyle='#8B77FF';
+  const emoji = TYPE_EMOJIS[r.code] || '✨';
+  ctx.fillText(`${emoji}  ${r.code}`, 40, 250);
+
+  const bars=[
+    {lab:'E / I', p:r.percents.EI.E, colors:['#8B77FF','#4DA3FF']},
+    {lab:'S / N', p:r.percents.SN.S, colors:['#4DA3FF','#FFB84D']},
+    {lab:'T / F', p:r.percents.TF.T, colors:['#66E3A4','#FF6B6B']},
+    {lab:'J / P', p:r.percents.JP.J, colors:['#FFB84D','#4DA3FF']}
+  ];
+  ctx.fillStyle='#2f2f33'; ctx.font='20px system-ui';
+  let y=320; bars.forEach(b=>{ ctx.fillText(b.lab,40,y); drawBar(ctx,120,y-14, 600,18, b.p/100, b.colors[0], b.colors[1]); y+=60; });
+
+  ctx.font='24px system-ui'; ctx.fillStyle='#2f2f33';
+  const desc=(TYPE_PROFILES[r.code]?.desc?.[state.lang])||''; drawMultiline(ctx, desc, 40, y, 820, 30); y+=120;
+
+  ctx.font='bold 24px system-ui'; ctx.fillText(i18n[state.lang].representatives, 40, y); y+=36;
+  ctx.font='20px system-ui';
+  const reps=(TYPE_PROFILES[r.code]?.reps?.[state.lang]||[]).slice(0,2);
+  reps.forEach((rep,i)=>{ const t=`• ${rep.name} —— ${rep.why}｜“${rep.quote}”`; drawMultiline(ctx, t, 40, y+i*32, 820, 28); });
+
+  ctx.font='16px system-ui'; ctx.fillStyle='#6b6f76';
+  ctx.fillText(i18n[state.lang].shareFooter, 40, H-60);
+
+  canvas.classList.remove('hidden');
+  const url=canvas.toDataURL('image/png');
+  const a=document.createElement('a'); a.href=url; a.download=`MBTI_${state.name}_${r.code}.png`; document.body.appendChild(a); a.click(); setTimeout(()=>a.remove(),0);
+  showToast(state.lang==='zh'?'已下载图片':'Image downloaded');
+});
+function drawBar(ctx,x,y,w,h,ratio,c1,c2){
+  ctx.fillStyle='rgba(0,0,0,0.08)'; roundRect(ctx,x,y,w,h,9); ctx.fill();
+  const gw=Math.max(2,Math.round(w*ratio)); const grad=ctx.createLinearGradient(x,0,x+w,0); grad.addColorStop(0,c1); grad.addColorStop(1,c2);
+  ctx.fillStyle=grad; roundRect(ctx,x,y,gw,h,9); ctx.fill();
+}
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function drawMultiline(ctx,text,x,y,maxW,lineH){ const chars=text.split(''); let line='',yy=y; chars.forEach(ch=>{ const t=line+ch; if(ctx.measureText(t).width>maxW){ ctx.fillText(line,x,yy); yy+=lineH; line=ch; } else line=t; }); if(line) ctx.fillText(line,x,yy); }
+
+/* ---------- 页面切换 ---------- */
+function show(sectionId){ ['intro','quiz','result'].forEach(id=>$('#'+id).classList.add('hidden')); $('#'+sectionId).classList.remove('hidden'); scrollTo({top:0,behavior:'smooth'}); }
+
+/* ---------- 事件 ---------- */
+function validateInfo(){
+  state.name=$('#inp-name').value.trim(); state.cls=$('#inp-class').value.trim();
+  if(!state.name){ showToast(state.lang==='zh'?'请填写姓名':'Please enter your name'); return false; }
+  if(!state.cls){ showToast(state.lang==='zh'?'请填写班级':'Please enter your class'); return false; }
+  return true;
+}
+$('#btn-start').addEventListener('click', ()=>{ if(!validateInfo()) return; renderQuestions(); show('quiz'); });
+$('#btn-scrollTop').addEventListener('click', ()=>scrollTo({top:0,behavior:'smooth'}));
+$('#btn-jumpUnanswered').addEventListener('click', ()=>{
+  for(const q of state.shuffled){ if(!state.answers[q.id]){ const el=$$(`.chip[data-q="${q.id}"]`)[0]; el?.scrollIntoView({behavior:'smooth',block:'center'}); el?.focus(); return; } }
+  showToast(state.lang==='zh'?'已全部作答':'All answered');
+});
+$('#btn-submit').addEventListener('click', ()=>{
+  const res=computeResult(); if(res.error){ showToast(state.lang==='zh'?'还有未答题目':'Some questions are unanswered'); return; }
+  state.result=res; state.tieBreakUsed=!!res.tieBreak; renderResult(); show('result');
+});
+$('#btn-retake').addEventListener('click', ()=>{ state.answers={}; renderQuestions(); show('quiz'); });
+
+/* ---------- 语言&动效按钮 ---------- */
+$('#lang-zh').addEventListener('click', ()=>setLang('zh'));
+$('#lang-en').addEventListener('click', ()=>setLang('en'));
+$('#motion-standard').addEventListener('click', ()=>{ setMotion('standard'); showToast(state.lang==='zh'?'已切换标准动效':'Standard motion on'); });
+$('#motion-reduced').addEventListener('click', ()=>{ setMotion('reduced'); showToast(state.lang==='zh'?'已切换弱动效':'Reduced motion on'); });
+
+/* ---------- 背景音乐控制（使用你提供的音频） ---------- */
+const audioEl = document.getElementById('bgm-audio');
+const musicToggle = document.getElementById('music-toggle');
+const musicVol = document.getElementById('music-vol');
+
+function updateMusicTexts(){
+  const dict=i18n[state.lang];
+  musicToggle.textContent = state.music.enabled ? dict.musicOff : dict.musicOn;
+}
+async function toggleMusic(){
+  state.music.enabled = !state.music.enabled;
+  try{
+    if(state.music.enabled){
+      audioEl.volume = state.music.volume;
+      await audioEl.play();
+    }else{
+      audioEl.pause();
+    }
+    updateMusicTexts();
+    showToast(state.lang==='zh'?(state.music.enabled?'音乐已开启':'音乐已关闭'):(state.music.enabled?'Music on':'Music off'));
+  }catch(e){
+    state.music.enabled=false; updateMusicTexts();
+    console.warn(e);
+    showToast(state.lang==='zh'?'播放被浏览器阻止，请再点一次“开启”':'Autoplay blocked, tap On again');
+  }
+}
+musicToggle.addEventListener('click', toggleMusic);
+musicVol.addEventListener('input', ()=>{
+  const v = Math.max(0, Math.min(1, musicVol.value/100));
+  state.music.volume = v; audioEl.volume = v;
+});
+
+/* ---------- 初始化 ---------- */
+(function init(){
+  setLang('zh');
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ setMotion('reduced'); } else setMotion('standard');
+  // 初始化音乐UI
+  musicVol.value = Math.round(state.music.volume*100);
+  audioEl.volume = state.music.volume;
+  updateMusicTexts();
+})();
+</script>
+</body>
+</html>
